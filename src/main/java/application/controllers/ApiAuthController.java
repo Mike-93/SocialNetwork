@@ -1,4 +1,4 @@
-package application.Controllers;
+package application.controllers;
 
 import application.dao.CheckLogin;
 import application.model.Person;
