@@ -1,4 +1,4 @@
-package application.api;
+package application.Controllers;
 
 import application.dao.CheckLogin;
 import application.model.Person;
@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import java.util.Optional;
 
 @Controller
-public class AuthApiGeneral {
+public class ApiAuthController {
     private final CheckLogin checkLogin;
 
     @Autowired
-    public AuthApiGeneral(CheckLogin checkLogin) {
+    public ApiAuthController(CheckLogin checkLogin) {
         this.checkLogin = checkLogin;
     }
 
