@@ -7,11 +7,11 @@
       :push="countPush(dialog.unread_count)"
       :me="dialog.last_message.isSentByMe"
       :active="activeDialog && dialog.id === activeDialog.id"
-      :online="checkOnlineUser(dialog.last_message.recipient.last_online_time)"
+      :online="checkOnlineUser(dialog.recipient.last_online_time)"
       @click.native="clickOnDialog(dialog.id)")
     .im__chat(v-if="activeDialog")
       im-chat(:info="activeDialog" :messages="messages"
-      :online="checkOnlineUser(activeDialog.last_message.recipient.last_online_time)" )
+      :online="checkOnlineUser(activeDialog.recipient.last_online_time)" )
 </template>
 
 <script>
@@ -50,9 +50,11 @@ export default {
         vm.switchDialog(route.query.activeDialog)
       } else if (route.query.userId) {
         vm.createDialogWithUser(route.query.userId)
-      } else if (vm.dialogs.length > 0) {
-        vm.$router.push({ name: 'Im', query: { activeDialog: vm.dialogs[0].id } })
-      } else {
+      }
+      // else if (vm.dialogs.length > 0) {
+      //   vm.$router.push({ name: 'Im', query: { activeDialog: vm.dialogs[0].id } })
+      // }
+      else {
         await vm.apiLoadAllDialogs()
         if (vm.dialogs.length > 0) {
           vm.$router.push({ name: 'Im', query: { activeDialog: vm.dialogs[0].id } })

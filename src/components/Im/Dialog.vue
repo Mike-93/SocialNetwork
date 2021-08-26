@@ -1,13 +1,13 @@
 <template lang="pug">
   .im-dialog(:class="{active, push}")
-    router-link.im-dailog__pic(:to="{name: 'ProfileId', params: {id: info.last_message.recipient.id}}")
-      img(:src="info.last_message.recipient.photo" :alt="info.last_message.recipient.first_name")
+    router-link.im-dailog__pic(:to="{name: 'ProfileId', params: {id: info.recipient.id}}")
+      img(:src="info.recipient.photo" :alt="info.recipient.first_name")
     .im-dialog__info
-      router-link.im-dialog__name(:to="{name: 'ProfileId', params: {id: info.last_message.recipient.id}}") {{info.last_message.recipient.first_name + ' ' + info.last_message.recipient.last_name}}
+      router-link.im-dialog__name(:to="{name: 'ProfileId', params: {id: info.recipient.id}}") {{info.recipient.first_name + ' ' + info.recipient.last_name}}
       span.user-status(:class="{online}") {{statusText}}
     .im-dialog__content
       p.im-dialog__last
-        span.im-dialog__last-me(v-if="me") Вы: 
+        span.im-dialog__last-me(v-if="me") Вы:
         | {{info.last_message.message_text}}
       span.im-dialog__time {{info.last_message.time | moment('from')}}
     span.im-dialog__push(v-if="push > 0") {{push}}
@@ -28,7 +28,7 @@ export default {
     statusText() {
       return this.online
         ? 'Онлайн'
-        : 'был в сети ' + moment(this.info.last_message.recipient.last_online_time).fromNow()
+        : 'был в сети ' + moment(this.info.recipient.last_online_time).fromNow()
     }
   }
 }
