@@ -10,6 +10,8 @@ export default {
       if (this.activeDialog) {
         this.loadFreshMessages(this.activeDialog.id)
       }
+      this.apiLoadAllDialogs()
+      this.apiUnreadedMessages()
     }, INTERVAL_DIALOG_MS)
 
     this.intervalForNotifications = setInterval(() => {
@@ -20,7 +22,7 @@ export default {
     ...mapGetters('profile/dialogs', ['activeDialog']),
   },
   methods: {
-    ...mapActions('profile/dialogs', ['loadFreshMessages']),
+    ...mapActions('profile/dialogs', ['loadFreshMessages', 'apiLoadAllDialogs', 'apiUnreadedMessages']),
     ...mapActions('profile/notifications', ['apiNotifications']),
   },
   beforeDestroy () {
