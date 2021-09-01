@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface Dao<T> {
 
-    T get(int id);
+    T getById(int id);
 
     List<T> getAll();
 
@@ -12,5 +12,5 @@ public interface Dao<T> {
 
     void update(T t);
 
-    void delete(T t);
+    void delete(int id);
 }

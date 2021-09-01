@@ -1,29 +1,48 @@
 package application.service;
 
-import application.models.dto.NotificationDTO;
+import application.dao.DaoNotification;
+import application.dao.DaoPerson;
+import application.models.Notification;
+import application.models.dto.CommentAuthorDto;
+import application.models.dto.MessageResponseDto;
+import application.models.dto.NotificationDto;
 import application.models.responses.GeneralListResponse;
+import application.models.responses.GeneralResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class NotificationService {
+    private final DaoNotification daoNotification;
+    private final DaoPerson daoPerson;
 
+    public GeneralListResponse<NotificationDto> getNotifications() {
+        return new GeneralListResponse<>(getNotificationsDtoForNotifications
+                (daoNotification.getUserNotifications(daoPerson.getAuthPerson().getId())));
+    }
 
-    public GeneralListResponse<NotificationDTO> getNotifications() {
+    public GeneralResponse<MessageResponseDto> readNotifications() throws InterruptedException {
+        Thread.sleep(5000);
+        daoNotification.readNotifications(daoPerson.getAuthPerson().getId());
+        return new GeneralResponse<>(new MessageResponseDto("ok"));
+    }
 
-        List<NotificationDTO> notificationDTOList = new ArrayList<>();
-
-        NotificationDTO notificationDTO = new NotificationDTO();
-        notificationDTO.setId(1);
-        notificationDTO.setType_id(1);
-        notificationDTO.setSent_time(System.currentTimeMillis());
-        notificationDTO.setEntity_id(1);
-        notificationDTO.setInfo("Проверка сообщений");
-
-        notificationDTOList.add(notificationDTO);
-
-        return new GeneralListResponse<>(notificationDTOList);
+    private List<NotificationDto> getNotificationsDtoForNotifications(List<Notification> list) {
+        List<NotificationDto> notificationDtoList = new ArrayList<>();
+        for (Notification notification : list) {
+            NotificationDto notificationDto = new NotificationDto();
+            notificationDto.setId(notification.getId());
+            notificationDto.setNotificationType(daoNotification.getNotificationType(notification.getId()));
+            notificationDto.setEntityAuthor(new CommentAuthorDto(1, "Вася",
+                    "Петров", "storage/stock.jpg"));
+            notificationDto.setSentTime(notification.getSentTime());
+            notificationDto.setInfo(daoNotification.getNotificationName(notification.getId()));
+            notificationDtoList.add(notificationDto);
+        }
+        return notificationDtoList;
     }
 }

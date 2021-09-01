@@ -1,9 +1,11 @@
 package application.controllers;
 
-import application.models.dto.MessageRequestDto;
+import application.models.Post;
+import application.models.dto.MessageResponseDto;
 import application.models.dto.PersonDto;
 import application.models.dto.PostDto;
 import application.models.requests.PersonSettingsDtoRequest;
+import application.models.requests.PostRequest;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import application.service.ProfileService;
@@ -11,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
+import java.text.ParseException;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -47,13 +49,20 @@ public class ProfileController {
     }
 
     @PutMapping("/me")
-    public ResponseEntity<GeneralResponse<PersonDto>> updateProfile(HttpServletRequest servletRequest,
-                                                                    @RequestBody PersonSettingsDtoRequest request){
+    public ResponseEntity<GeneralResponse<PersonDto>> updateProfile(
+            @RequestBody PersonSettingsDtoRequest request) throws ParseException, InterruptedException {
         return profileService.changeProfile(request);
     }
 
+    @PostMapping("/{id}/wall")
+    public ResponseEntity<GeneralResponse<Post>> addPost(@PathVariable int id,
+                                                         @RequestParam(value = "publish_date", required = false) Long publishDate,
+                                                         @RequestBody PostRequest postRequest) {
+        return ResponseEntity.ok(profileService.setPost(id, publishDate, postRequest));
+    }
+
     @DeleteMapping("/me")
-    public ResponseEntity<GeneralResponse<MessageRequestDto>> deleteProfile(){
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> deleteProfile(){
         return profileService.deleteProfile();
     }
 }

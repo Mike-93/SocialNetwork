@@ -1,7 +1,9 @@
 package application.dao;
 
+import application.dao.mappers.IdMapper;
 import application.dao.mappers.PersonMapper;
 import application.models.FriendshipStatus;
+import application.models.NotificationType;
 import application.models.PermissionMessagesType;
 import application.models.Person;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +23,14 @@ import java.util.List;
 public class DaoPerson implements Dao<Person> {
 
     private final JdbcTemplate jdbcTemplate;
+    private final DaoNotification daoNotification;
 
+    public Integer getPersonIdByEmail(String email) {
+        String selectPersonIdByEmail = "SELECT id FROM person WHERE e_mail = ?";
+
+        return jdbcTemplate.query(selectPersonIdByEmail, new Object[]{email}, new IdMapper())
+            .stream().findAny().orElse(null);
+    }
 
     public Person getByEmail(String email) {
         String selectPersonByEmail = "SELECT * FROM person WHERE e_mail = ?";
@@ -37,7 +46,7 @@ public class DaoPerson implements Dao<Person> {
     }
 
     @Override
-    public Person get(int id) {
+    public Person getById(int id) {
         String selectPersonForId = "SELECT * FROM person WHERE id = ?";
         return jdbcTemplate.query(selectPersonForId, new Object[]{id}, new PersonMapper()).stream()
                 .findAny().orElse(null);
@@ -62,15 +71,16 @@ public class DaoPerson implements Dao<Person> {
 
     public void save(Person person) {
         String sqlInsertPerson = "INSERT INTO person (first_name, last_name, password," +
-                " e_mail, reg_date, messages_permission) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+                " e_mail, reg_date, messages_permission, photo) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(sqlInsertPerson,
                 person.getFirstName(),
                 person.getLastName(),
                 person.getPassword(),
                 person.getEmail(),
                 System.currentTimeMillis(),
-                PermissionMessagesType.ALL.toString());
+                PermissionMessagesType.ALL.toString(),
+                person.getPhoto());
     }
 
     @Override
@@ -98,8 +108,8 @@ public class DaoPerson implements Dao<Person> {
     }
 
     @Override
-    public void delete(Person person) {
-        jdbcTemplate.update("DELETE FROM person where id = ?", person.getId());
+    public void delete(int id) {
+        jdbcTemplate.update("DELETE FROM person where id = ?", id);
     }
 
     public void deleteFriendshipByPersonId(int id){
@@ -132,6 +142,10 @@ public class DaoPerson implements Dao<Person> {
                 FriendshipStatus.REQUEST.toString());
 
         jdbcTemplate.update(insetIntoFriendship, srcId, dtsId);
+        int entityId = jdbcTemplate.queryForObject("SELECT status_id FROM friendship WHERE src_person_id IN (?, ?) AND dst_person_id" +
+                " IN (?, ?)", new Object[]{srcId, dtsId, dtsId, srcId}, Integer.class);
+        daoNotification.addNotification(dtsId, System.currentTimeMillis(), entityId,
+                getById(dtsId).getEmail(), NotificationType.FRIEND_REQUEST.toString());
     }
 
     public void addFriendRequest(int srcId, int dtsId) {
@@ -243,4 +257,17 @@ public class DaoPerson implements Dao<Person> {
         jdbcTemplate.update(query, email, id);
     }
 
+    public Long getLastOnlineTime(int id) {
+        String query = "SELECT last_online_time FROM person WHERE id = ?";
+        try {
+            return jdbcTemplate.queryForObject(query, new Object[]{id}, Long.class);
+        } catch (EmptyResultDataAccessException ex) {
+            return null;
+        }
+    }
+
+    public void updateLastOnlineTime(int id) {
+        String query = "UPDATE person SET last_online_time = ? WHERE id = ?";
+        jdbcTemplate.update(query, System.currentTimeMillis(), id);
+    }
 }
