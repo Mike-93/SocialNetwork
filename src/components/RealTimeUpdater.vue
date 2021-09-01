@@ -9,8 +9,8 @@ export default {
     this.intervalForMessages = setInterval(() => {
       if (this.activeDialog) {
         this.loadFreshMessages(this.activeDialog.id)
+        this.apiLoadAllDialogs()
       }
-      this.apiLoadAllDialogs()
       this.apiUnreadedMessages()
     }, INTERVAL_DIALOG_MS)
 

@@ -1,7 +1,7 @@
 <template lang="pug">
   .push-block
     .push__img
-      img(:src="info.photo" :alt="info.entity_author.first_name")
+      img(:src="info.entity_author.photo" :alt="info.entity_author.first_name")
     p.push__content
       router-link.push__content-name(:to="getRouteByNotification(info)")
         | {{info.entity_author.first_name + ' ' + info.entity_author.last_name}}
