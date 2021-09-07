@@ -39,6 +39,5 @@ axios.interceptors.response.use(null, error => {
     })
   }
 
-  console.error(error)
   return Promise.reject(error)
 });

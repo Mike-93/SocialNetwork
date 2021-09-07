@@ -7,6 +7,7 @@ import global from './global'
 import auth from './auth'
 import profile from './profile'
 import users from './users'
+import getRandomIntInclusive from '../utils/getRandomIntInclusive.js'
 
 export default new Vuex.Store({
   namespaced: true,
@@ -17,7 +18,7 @@ export default new Vuex.Store({
     users
   },
   state: {
-    code: 3675
+    code: getRandomIntInclusive,
   },
   getters: {
     getCode: s => s.code
