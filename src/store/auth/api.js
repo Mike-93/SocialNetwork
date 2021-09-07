@@ -58,8 +58,9 @@ export default {
       }).catch(error => {
         commit('setStatus', 'error')
         localStorage.removeItem('user-token')
-        store.dispatch('auth/api/logout')
+        throw error;
       })
+      return null;
     },
     async logout({
       commit,
