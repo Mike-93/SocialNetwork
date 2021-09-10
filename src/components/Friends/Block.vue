@@ -110,6 +110,11 @@ export default {
   margin: 0 10px 20px;
 }
 
+.friends-block.friends-block_inner {
+  max-width 100%
+  margin 16px 0 0 0
+}
+
 .friends-block__img {
   width: 65px;
   height: 65px;
