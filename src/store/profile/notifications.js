@@ -42,9 +42,10 @@ export default {
           commit('setNotifications', response.data.data)
         // }
         // добавить когда будет прод
-        // setTimeout(() => {
-        //   dispatch('apiNotifications')
-        // }, 5000)
+        setTimeout(() => {
+          dispatch('apiNotifications')
+        }, 5000)
+
       }).catch(() => {})
     },
     async readNotifications() {

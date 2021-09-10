@@ -7,7 +7,7 @@
         input.main-layout__search-input(type="text" placeholder="Поиск" :value="searchText" @input="setSearchText($event.target.value)")
       .main-layout__push(@click="togglePush")
         simple-svg(:filepath="'/static/img/push.svg'" :data-push="getNotificationsLength > 0 ? getNotificationsLength : false")
-        push(:isOpen="isOpenPush" @close-push="togglePush")
+        push(:isOpen="isOpenPush && getNotificationsLength > 0" @close-push="togglePush")
     router-link.main-layout__user(v-if="getInfo" :to="{name: 'Profile'}")
       .main-layout__user-pic
         img(:src="getInfo.photo" :alt="getInfo.fullName")
@@ -22,7 +22,7 @@ export default {
   name: 'MainLayoutHeader',
   components: { Push },
   data: () => ({
-    isOpenPush: false
+    isOpenPush: false,
   }),
   computed: {
     ...mapGetters('global/search', ['searchText']),
@@ -30,7 +30,7 @@ export default {
     ...mapGetters('profile/notifications', ['getNotificationsLength']),
     isAdminPage() {
       return this.$route.path.indexOf('admin') !== -1
-    }
+    },
   },
   methods: {
     ...mapMutations('global/search', ['setSearchText']),
