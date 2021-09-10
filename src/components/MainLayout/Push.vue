@@ -2,8 +2,9 @@
   .push(:class="{open: isOpen}")
     .push__overlay(@click.stop="closePush")
     .push__wrap(:class="{open: isOpen}" ref="wrap")
+      button.push__close(@click="closeReadNotifications" title="скрыть все уведомления") X
       .push__list(ref="list")
-        .push__item(v-for="info in getNotifications.slice(0,10)" :key="info.id")
+        .push__item(v-for="info in getNotifications.slice(0, 10)" :key="info.id" @click.stop="")
           .push__img
             img(:src="info.entity_author.photo" :alt="info.entity_author.first_name")
           p.push__content
@@ -25,15 +26,7 @@ export default {
     isOpen: Boolean
   },
   computed: {
-    ...mapGetters('profile/notifications', ['getNotifications', 'getNotificationsLength', 'getNotificationsTextType'])
-  },
-  watch: {
-    isOpen(val) {
-      if (val) {
-        this.$refs.list.scrollTop = 0
-        this.readNotifications()
-      }
-    }
+    ...mapGetters('profile/notifications', ['getNotifications', 'getNotificationsLength', 'getNotificationsTextType']),
   },
   methods: {
     ...mapActions('profile/notifications', ['apiNotifications', 'readNotifications']),
@@ -41,6 +34,10 @@ export default {
     closePush() {
       if (!this.isOpen) return
       this.$emit('close-push')
+    },
+
+    closeReadNotifications() {
+      this.readNotifications()
     }
   },
   mounted() {
@@ -124,7 +121,7 @@ export default {
 
 .push__list {
   overflow-y: auto;
-  max-height: 543px;
+  max-height: 400px;
 }
 
 .push__item {
@@ -132,6 +129,7 @@ export default {
   align-items: center;
   padding: 35px 0;
   margin: 0 40px;
+  cursor default
 
   &+& {
     border-top: 1px solid #E7E7E7;
@@ -148,5 +146,19 @@ export default {
   color: eucalypt;
   border-top: 1px solid #E7E7E7;
   height: 85px;
+}
+
+.push__close {
+  position sticky
+  z-index 2000
+  top 12px
+  right 12px
+  background transparent
+  cursor: pointer
+  padding 4px
+  font-weight bold
+  display: block;
+  margin-left: auto;
+  transform: translateX(-40px);
 }
 </style>

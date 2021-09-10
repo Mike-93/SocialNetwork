@@ -14,7 +14,10 @@ export default {
   name: 'Like',
   props: {
     quantity: Number,
-    active: Boolean,
+    active: {
+      type: Number,
+      default: 0,
+    },
     fill: Boolean,
     width: {
       type: String,
@@ -33,7 +36,7 @@ export default {
   },
   data: () => ({
     localQuantity: null,
-    localActive: null
+    localActive: false,
   }),
   watch: {
     quantity(val) {
