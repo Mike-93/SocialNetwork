@@ -14,6 +14,7 @@ export default {
       }
       result.fullName = result.first_name + ' ' + result.last_name
       result.ages = moment().diff(result.birth_date, 'years')
+      result.photo = 'https://cdn.dribbble.com/users/454765/screenshots/16425729/media/bb8580319ffb1a5e9faa82475a9fd394.jpg'
       return result
     }
   },

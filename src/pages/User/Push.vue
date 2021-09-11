@@ -40,7 +40,7 @@ export default {
   beforeRouteEnter(to, from, next) {
     next(vm => {
       vm.apiNotifications()
-      vm.readNotifications()
+      // vm.readNotifications()
     })
   }
 }

@@ -174,6 +174,9 @@ export default {
 
   img {
     width: 100%;
+    object-fit: cover;
+    max-width: 100%;
+    height: 100%;
   }
 }
 

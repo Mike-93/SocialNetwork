@@ -23,10 +23,19 @@ export default {
         case 'MESSAGE':
           return 'прислал сообщение'
       }
-    }
+    },
   },
   mutations: {
-    setNotifications: (s, value) => s.notifications = value
+    setNotifications: (s, value) => s.notifications = value,
+    resetNotifications: (s) => s.notifications = [],
+    deleteNotifications: (state, id) => {
+      state.notifications = state.notifications.filter((item) => item.id !== id);
+    },
+    syncNotifications(state) {
+      state.notifications = state.notifications.map((item) => ({
+        ...item
+      }));
+    },
   },
   actions: {
     async apiNotifications({
@@ -48,11 +57,23 @@ export default {
 
       }).catch(() => {})
     },
-    async readNotifications() {
+    async readNotificationItem(context, id) {
+      context.commit('deleteNotifications', id);
+      await axios(
+        {
+        url: `notifications?id=${id}`,
+        method: 'PUT'
+      }).then(() => {
+        context.commit('syncNotifications')
+      }).catch((error) => {console.log(error)})
+    },
+    async readNotifications(context) {
       await axios({
         url: 'notifications?all=true',
         method: 'PUT'
-      }).then(response => {}).catch(() => {})
+      }).then(() => {
+        context.commit('resetNotifications')
+      }).catch(() => {})
     }
   }
 }

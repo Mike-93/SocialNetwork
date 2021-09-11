@@ -9,10 +9,11 @@
         | {{getNotificationsTextType(info.event_type)}}
       span.push__content-preview «{{info.info}}»
     span.push__time {{info.sent_time | moment('from')}}
+    button.push-block__close(@click="readNotification(info.id)" title="скрыть уведомление") Х
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import { getRouteByNotification } from '@/utils/notifications.utils.js'
 export default {
   name: 'PushBlock',
@@ -23,13 +24,19 @@ export default {
     ...mapGetters('profile/notifications', ['getNotificationsTextType'])
   },
   methods: {
-    getRouteByNotification
+    ...mapActions('profile/notifications', ['readNotificationItem']),
+    getRouteByNotification,
+
+    readNotification(id) {
+      this.readNotificationItem(id)
+    },
   }
 }
 </script>
 
 <style lang="stylus">
 .push-block {
+  position relative
   background: #fff;
   padding: 25px 30px;
   box-shadow: 0px 2px 60px rgba(0, 0, 0, 0.1);
@@ -48,9 +55,28 @@ export default {
     padding-top: 10px;
   }
 
+  .push__content-name {
+    display inline-block
+    margin-right 16px
+  }
+
   .push__time {
     flex: none;
     padding-top: 20px;
+  }
+
+  .push-block__close {
+    position absolute
+    cursor: pointer
+    top  8px
+    right 8px
+    z-index 11
+    font-weight bold
+    background transparent
+  }
+
+  .push-block__close:hover {
+    color red
   }
 }
 </style>
