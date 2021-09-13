@@ -1,7 +1,7 @@
 <template lang="pug">
   .comment-main
     template(v-if="info.is_deleted")
-      p.comment-main__text Комментарий удален. 
+      p.comment-main__text Комментарий удален.
         a(href="#" @click="onRecoverComment") Восстановить
     template(v-else)
       .edit.edit--small(v-if="edit || deleted")
@@ -10,7 +10,8 @@
         .edit__icon(v-if="edit" @click="editComment")
           simple-svg(:filepath="'/static/img/edit.svg'")
       router-link.comment-main__pic(:to="{name: 'ProfileId', params: {id: info.author.id}}")
-        img(:src="info.author.photo" :alt="info.author.first_name")
+        img(v-if="info.author.photo" :src="info.author.photo" :alt="info.author.first_name")
+        img(v-else src="/static/img/user/1.jpg" :alt="info.author.first_name")
       .comment-main__main
         router-link.comment-main__author(:to="{name: 'ProfileId', params: {id: info.author.id}}") {{info.author.first_name + ' ' + info.author.last_name}}
         p.comment-main__text {{info.comment_text}}

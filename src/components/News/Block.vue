@@ -17,7 +17,8 @@
         span.news-block__deffered-text Дата и время публикации: {{info.time | moment('DD.MM.YYYY, HH:mm')}} ({{diffTime(info.time)}})
       .news-block__author(v-if="!deffered")
         router-link.news-block__author-pic(:to="{name: 'ProfileId', params: {id: info.author.id}}")
-          img(:src="info.author.photo" :alt="info.author.first_name")
+          img(v-if="info.author.photo" :src="info.author.photo" :alt="info.author.first_name")
+          img(v-else src="/static/img/user/admin.png" :alt="info.author.first_name")
         .news-block__author-info
           router-link.news-block__author-name(:to="{name: 'ProfileId', params: {id: info.author.id}}") {{info.author.first_name + ' ' + info.author.last_name}}
           span.news-block__author-time {{info.time | moment("from")}}
@@ -33,11 +34,11 @@
       .news-block__actions(v-if="!deffered && !admin")
         .news-block__actions-block
           like-comment(
-            :quantity="info.likes" 
-            width="16px" 
-            height="16px" 
+            :quantity="info.likes"
+            width="16px"
+            height="16px"
             font-size="15px"
-            @liked="likeAction" 
+            @liked="likeAction"
             :active="info.my_like"
             :id="info.id"
           )
@@ -45,10 +46,10 @@
           like-comment(:quantity="commentsLength" width="16px" height="16px" font-size="15px" comment)
       .news-block__comments(v-if="!deffered")
         comments(
-          :admin="admin" 
-          :info="info.comments" 
+          :admin="admin"
+          :info="info.comments"
           :id="info.id"
-          :edit="edit" 
+          :edit="edit"
           :deleted="deleted"
         )
 </template>

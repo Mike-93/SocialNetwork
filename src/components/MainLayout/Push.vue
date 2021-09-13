@@ -2,7 +2,7 @@
   .push(:class="{open: isOpen}")
     .push__overlay(@click.stop="closePush")
     .push__wrap(:class="{open: isOpen}" ref="wrap")
-      button.push__close(@click="closeReadNotifications" title="скрыть все уведомления") X
+      button.push__close(@click="closeReadNotifications" title="скрыть все уведомления") Скрыть все уведомления
       .push__list(ref="list")
         .push__item(v-for="info in getNotifications.slice(0, 10)" :key="info.id" @click.stop="")
           .push__img
@@ -14,6 +14,7 @@
               | {{getNotificationsTextType(info.event_type)}}
             span.push__content-preview  «{{info.info}}»
           span.push__time {{info.sent_time | moment('from')}}
+          button.push__close.push__close_item(@click="closeReadNotificationItem(info.id)" title="скрыть уведомление") X
       router-link.push__btn(:to="{name: 'Push'}" v-if="getNotificationsLength > 1") Показать все ({{getNotificationsLength}})
 </template>
 
@@ -29,7 +30,7 @@ export default {
     ...mapGetters('profile/notifications', ['getNotifications', 'getNotificationsLength', 'getNotificationsTextType']),
   },
   methods: {
-    ...mapActions('profile/notifications', ['apiNotifications', 'readNotifications']),
+    ...mapActions('profile/notifications', ['apiNotifications', 'readNotifications', 'readNotificationItem']),
     getRouteByNotification,
     closePush() {
       if (!this.isOpen) return
@@ -38,7 +39,11 @@ export default {
 
     closeReadNotifications() {
       this.readNotifications()
-    }
+    },
+
+    closeReadNotificationItem(id) {
+      this.readNotificationItem(id)
+    },
   },
   mounted() {
     if (this.getNotificationsLength === 0) this.apiNotifications()
@@ -125,6 +130,7 @@ export default {
 }
 
 .push__item {
+  position relative
   display: flex;
   align-items: center;
   padding: 35px 0;
@@ -156,9 +162,27 @@ export default {
   background transparent
   cursor: pointer
   padding 4px
-  font-weight bold
   display: block;
   margin-left: auto;
-  transform: translateX(-40px);
+  transform: translateX(-40px)
+  color red
+  transition color .3s ease
+}
+
+.push__close:hover {
+  color: #000
+}
+
+.push__close.push__close_item {
+  position absolute
+  top 16px
+  right 0
+  padding 4px
+  font-weight bold
+  color #000
+}
+
+.push__close.push__close_item:hover {
+  color: red
 }
 </style>

@@ -44,17 +44,18 @@ export default {
     admin: Boolean,
     blocked: Boolean,
     moderator: Boolean,
-    info: {
-      type: Object,
-      default: () => ({
-        first_name: 'Артем',
-        last_name: 'Иващенко',
-        birth_date: 1559751301818,
-        town_id: 1,
-        photo: '/static/img/user/1.jpg',
-        id: 124
-      })
-    }
+    info: Object,
+    // info: {
+    //   type: Object,
+    //   default: () => ({
+    //     first_name: 'Артем',
+    //     last_name: 'Иващенко',
+    //     birth_date: 1559751301818,
+    //     town_id: 1,
+    //     photo: '/static/img/user/1.jpg',
+    //     id: 124
+    //   })
+    // }
   },
   components: { Modal },
   data: () => ({

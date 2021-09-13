@@ -5,16 +5,26 @@ export default {
   state: {
     result: {
       friends: [],
-      request: [],
+      request: [
+        {
+          first_name: 'Артем',
+          last_name: 'Иващенко',
+          birth_date: 1559751301818,
+          town_id: 1,
+          photo: '/static/img/user/1.jpg',
+          id: 124
+        }
+
+      ],
       recommendations: []
     }
   },
   getters: {
     getResult: s => s.result,
-    getResultById: s => id => s.result[id]
+    getResultById: s => id => s.result[id],
   },
   mutations: {
-    setResult: (s, payload) => s.result[payload.id] = payload.value
+    setResult: (s, payload) => s.result[payload.id] = payload.value,
   },
   actions: {
     async apiFriends({
@@ -59,7 +69,7 @@ export default {
         url: `friends/${id}`,
         method: 'POST'
       }).then(response => {
-        console.log("TCL: response", response)
+        // console.log("TCL: response", response)
         dispatch('global/alert/setAlert', {
           status: 'success',
           text: 'Заявка отправлена'
@@ -67,6 +77,7 @@ export default {
           root: true
         })
         dispatch('apiFriends')
+        console.log(response.data.data)
       }).catch(error => {})
     },
     async apiRequest({
@@ -80,7 +91,6 @@ export default {
         url: `friends/request?${query.join('&')}`,
         method: 'GET'
       }).then(response => {
-        console.log("TCL: request", response)
         commit('setResult', {
           id: 'request',
           value: response.data.data
@@ -100,7 +110,7 @@ export default {
       }).then(response => {
         commit('setResult', {
           id: 'recommendations',
-          value: response.data.data
+          value: response.data.data,
         })
       }).catch(error => {})
     }
