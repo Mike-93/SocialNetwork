@@ -5,17 +5,7 @@ export default {
   state: {
     result: {
       friends: [],
-      request: [
-        // {
-        //   first_name: 'Артем',
-        //   last_name: 'Иващенко',
-        //   birth_date: 1559751301818,
-        //   town_id: 1,
-        //   photo: '/static/img/user/1.jpg',
-        //   id: 124
-        // }
-
-      ],
+      request: [],
       recommendations: []
     }
   },
@@ -80,7 +70,7 @@ export default {
         console.log(response.data.data)
       }).catch(error => {})
     },
-    async apiRequest({
+    async apiRequestFriends({
       commit
     }, payload) {
       let query = []

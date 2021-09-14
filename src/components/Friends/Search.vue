@@ -15,27 +15,27 @@
           select.select.friends-search__select(v-model.number="age_from")
             option(value="null" disabled) От
             option(value="31") От 31
-            option(value="32") От 32 
-            option(value="33") От 33 
+            option(value="32") От 32
+            option(value="33") От 33
           span.search__age-defis —
           select.select.friends-search__select(v-model.number="age_to")
             option(value="null" disabled) До
             option(value="34") До 34
             option(value="35") До 35
             option(value="36") До 36
-      .friends-search__block
-        label.search__label Регион:
-        .search__row
-          select.select.friends-search__select(v-model="country")
-            option(value="null" disabled) Страна
-            option Россия
-            option Англия
-            option США
-          select.select.friends-search__select(v-model="city")
-            option(value="null" disabled) Город
-            option Москва
-            option Лондон
-            option Техас
+      //- .friends-search__block
+      //-   label.search__label Регион:
+      //-   .search__row
+      //-     select.select.friends-search__select(v-model="country")
+      //-       option(value="null" disabled) Страна
+      //-       option Россия
+      //-       option Англия
+      //-       option США
+      //-     select.select.friends-search__select(v-model="city")
+      //-       option(value="null" disabled) Город
+      //-       option Москва
+      //-       option Лондон
+      //-       option Техас
     button.friends-possible__btn(type="submit")
       simple-svg(:filepath="'/static/img/search.svg'")
       span.friends-possible__link Искать друзей

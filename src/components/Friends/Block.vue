@@ -1,19 +1,20 @@
 <template lang="pug">
   .friends-block
     .friends-block__img
-      img(:src="info.photo" :alt="info.first_name")
+      //- img(v-if="info.photo" :src="info.photo" :alt="info.first_name")
+      img(src="https://cdn.dribbble.com/users/46355/screenshots/16437703/media/005f8da1e48c837f191515cfc1d573f0.png" :alt="info.first_name")
     .friends-block__info
       router-link.friends-block__name(:to="{name: 'ProfileId', params: {id: info.id}}") {{info.first_name}} {{info.last_name}}
-      span.friends-block__age-city(v-if="moderator") модератор
+      span.friends-block__age-city(v-if="info.moderator") модератор
       span.friends-block__age-city(v-else-if="info.birth_date && info.city") {{info.birth_date | moment('from', true)}}, {{info.city}}
       span.friends-block__age-city(v-else) профиль не заполнен
     .friends-block__actions
-      template(v-if="moderator")
+      template(v-if="info.moderator")
         .friends-block__actions-block(v-tooltip.bottom="'Редактировать'")
           simple-svg(:filepath="'/static/img/edit.svg'")
         .friends-block__actions-block(v-tooltip.bottom="'Удалить из списка'" @click="openModal('deleteModerator')")
           simple-svg(:filepath="'/static/img/delete.svg'")
-      template(v-else-if="admin")
+      template(v-else-if="info.admin")
         .friends-block__actions-block(v-tooltip.bottom="'Разблокировать'" v-if="blocked")
           simple-svg(:filepath="'/static/img/unblocked.svg'")
         .friends-block__actions-block(v-tooltip.bottom="'Заблокировать'" v-else)
@@ -21,8 +22,10 @@
       template(v-else)
         .friends-block__actions-block.message(v-tooltip.bottom="'Написать сообщение'" @click="sendMessage(info.id)")
           simple-svg(:filepath="'/static/img/sidebar/im.svg'")
-        .friends-block__actions-block.delete(v-tooltip.bottom="'Удалить из друзей'" @click="openModal('delete')" v-if="friend")
+        .friends-block__actions-block.delete(v-tooltip.bottom="'Удалить из друзей'" @click="openModal('delete')" v-if="info.friend")
           simple-svg(:filepath="'/static/img/delete.svg'")
+        //- .friends-block__actions-block.add(v-tooltip.bottom="'отправить запрос в друзья'" @click="apiRequestFriends(info.id)" v-else-if="!info.friend")
+        //-   simple-svg(:filepath="'/static/img/friend-add.svg'")
         .friends-block__actions-block.add(v-tooltip.bottom="'Добавить в друзья'" @click="apiAddFriends(info.id)" v-else)
           simple-svg(:filepath="'/static/img/friend-add.svg'")
         .friends-block__actions-block(v-tooltip.bottom="'Заблокировать'" @click="openModal('blocked')")
@@ -39,24 +42,7 @@ import Modal from '@/components/Modal'
 import { mapActions, mapGetters } from 'vuex'
 export default {
   name: 'FriendsBlock',
-  props: {
-    friend: Boolean,
-    admin: Boolean,
-    blocked: Boolean,
-    moderator: Boolean,
-    info: Object,
-    // info: {
-    //   type: Object,
-    //   default: () => ({
-    //     first_name: 'Артем',
-    //     last_name: 'Иващенко',
-    //     birth_date: 1559751301818,
-    //     town_id: 1,
-    //     photo: '/static/img/user/1.jpg',
-    //     id: 124
-    //   })
-    // }
-  },
+  props: ['info'],
   components: { Modal },
   data: () => ({
     modalShow: false,
@@ -64,17 +50,18 @@ export default {
   }),
   computed: {
     ...mapGetters('profile/dialogs', ['dialogs']),
+
     modalText() {
       return this.modalType === 'delete'
         ? `Вы уверены, что хотите удалить пользователя ${this.info.first_name + ' ' + this.info.last_name} из друзей?`
         : this.modalType === 'deleteModerator'
         ? `Вы уверены, что хотите удалить ${this.info.first_name + ' ' + this.info.last_name} из списка модераторов?`
         : `Вы уверены, что хотите заблокировать пользователя ${this.info.first_name + ' ' + this.info.last_name}?`
-    }
+    },
   },
   methods: {
-    ...mapActions('profile/friends', ['apiAddFriends', 'apiDeleteFriends']),
-    // ...mapActions('profile/dialogs', ['openDialog']),
+    ...mapActions('profile/friends', ['apiAddFriends', 'apiRequestFriends', 'apiDeleteFriends']),
+    ...mapActions('profile/dialogs', ['openDialog']),
     ...mapActions('users/actions', ['apiBlockUser', 'apiUnblockUser']),
     closeModal() {
       this.modalShow = false
