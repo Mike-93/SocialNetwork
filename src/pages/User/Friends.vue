@@ -11,11 +11,11 @@
       .friends__list(v-if="userFriends.friends.length")
         friends-block(v-for="info in userFriends.friends" :key="info.id" :info="info")
 
-      //- template(v-if="!userFriends.request.length")
-      //-   h2.friends__title Заявок в друзья нет
-      //- template(v-else)
-      //-   h2.friends__title Заявки в друзья
-      //-   friends-request(v-for="info in userFriends.request" :key="info.id" :info="info")
+      template(v-if="!userFriends.request.length")
+        h2.friends__title Заявок в друзья нет
+      template(v-else)
+        h2.friends__title Заявки в друзья
+        friends-request(v-for="info in userFriends.request" :key="info.id" :info="info")
 
     .inner-page__aside
       friends-possible
@@ -45,14 +45,29 @@ export default {
     userFriends() {
       return this.getResult;
     },
+
+    ...mapGetters('profile/friends', ['getResultById', 'getResult']),
+    requestFriends() {
+      return this.getResultById('request')
+    },
+    resultFriends() {
+      return this.getResultById('friends')
+    }
   },
   methods: {
-    ...mapActions('profile/friends', ['apiFriends'])
+    // ...mapActions('profile/friends', ['apiFriends', 'apiRequestFriends'])
+    ...mapActions('profile/friends', ['apiRequestFriends', 'apiResultFriends'])
   },
-  beforeRouteEnter(to, from, next) {
-    next(vm => {
-      vm.apiFriends()
-    })
-  }
+  mounted() {
+    if (this.requestFriends.length === 0) this.apiRequestFriends()
+    if (this.resultFriends.length === 0) this.apiResultFriends()
+  },
+  // beforeRouteEnter(to, from, next) {
+  //   next(vm => {
+  //     vm.apiFriends()
+  //   })
+  // }
 }
+// this.apiRequestFriends()
+
 </script>

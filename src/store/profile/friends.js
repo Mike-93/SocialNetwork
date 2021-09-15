@@ -15,10 +15,34 @@ export default {
   },
   mutations: {
     setResult: (s, payload) => s.result[payload.id] = payload.value,
+    setResultArray: (s, payload) => s.result[payload.id].push(payload.value),
+    resetFriendsById: (s, payload) => {
+      s.result[payload.id] = s.result[payload.id].filter((item) => item.payload.value.id !== payload.value.id);
+    },
   },
   actions: {
-    async apiFriends({
+    async isApiRequestFriends({
       commit
+    }, payload) {
+      let query = []
+      payload && Object.keys(payload).map(el => {
+        payload[el] && query.push(`${el}=${payload[el]}`)
+      })
+      await axios({
+        url: `friends/?${query.join('&')}`,
+        method: 'GET'
+      }).then(response => {
+        console.log(response.data.data)
+        commit('setResultArray', {
+          id: 'request',
+          value: response.data.data
+        })
+      }).catch(error => {
+        console.log(error)
+      })
+    },
+    async isApiFriends({
+      commit,
     }, payload) {
       let query = []
       payload && Object.keys(payload).map(el => {
@@ -28,12 +52,36 @@ export default {
         url: `friends?${query.join('&')}`,
         method: 'GET'
       }).then(response => {
-        console.log("TCL: friends", response)
-        commit('setResult', {
+        commit('setResultArray', {
+          id: 'friends',
+          value: ''
+        })
+        commit('resetFriendsById', {
+          id: 'request',
+          value: ''
+        })
+      })
+      .catch(error => {
+        console.log(error)
+      })
+    },
+    async apiFriends({
+      commit,
+    }, payload) {
+      let query = []
+      payload && Object.keys(payload).map(el => {
+        payload[el] && query.push(`${el}=${payload[el]}`)
+      })
+      await axios({
+        url: `friends?${query.join('&')}`,
+        method: 'GET'
+      }).then(response => {
+        commit('resetFriendsById', {
           id: 'friends',
           value: response.data.data
         })
-      }).catch(error => {})
+        // dispatch('apiFriends')
+      }).catch(error => {console.log(error)})
     },
     apiDeleteFriends({
       dispatch
@@ -50,7 +98,9 @@ export default {
           root: true
         })
         dispatch('apiFriends')
-      }).catch(error => {})
+      }).catch(error => {
+        console.log(error)
+      })
     },
     apiAddFriends({
       dispatch
@@ -59,16 +109,16 @@ export default {
         url: `friends/${id}`,
         method: 'POST'
       }).then(response => {
-        // console.log("TCL: response", response)
         dispatch('global/alert/setAlert', {
           status: 'success',
-          text: 'Заявка отправлена'
+          text: 'ok'
         }, {
           root: true
         })
         dispatch('apiFriends')
-        console.log(response.data.data)
-      }).catch(error => {})
+      }).catch(error => {
+        console.log(error)
+      })
     },
     async apiRequestFriends({
       commit
@@ -83,9 +133,26 @@ export default {
       }).then(response => {
         commit('setResult', {
           id: 'request',
-          value: response.data.data
+          value: response.data.data,
         })
-      }).catch(error => {})
+      }).catch(error => {console.log(error)})
+    },
+    async apiResultFriends({
+      commit
+    }, payload) {
+      let query = []
+      payload && Object.keys(payload).map(el => {
+        payload[el] && query.push(`${el}=${payload[el]}`)
+      })
+      await axios({
+        url: `friends/?${query.join('&')}`,
+        method: 'GET'
+      }).then(response => {
+        commit('setResult', {
+          id: 'friends',
+          value: response.data.data,
+        })
+      }).catch(error => {console.log(error)})
     },
     async apiRecommendations({
       commit

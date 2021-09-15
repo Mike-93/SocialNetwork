@@ -1,8 +1,8 @@
 <template lang="pug">
   .friends-block
     .friends-block__img
-      //- img(v-if="info.photo" :src="info.photo" :alt="info.first_name")
-      img(src="https://cdn.dribbble.com/users/46355/screenshots/16437703/media/005f8da1e48c837f191515cfc1d573f0.png" :alt="info.first_name")
+      img(v-if="info.photo" :src="info.photo" :alt="info.first_name")
+      img(v-else src="/static/img/user/2.webp" :alt="info.first_name")
     .friends-block__info
       router-link.friends-block__name(:to="{name: 'ProfileId', params: {id: info.id}}") {{info.first_name}} {{info.last_name}}
       span.friends-block__age-city(v-if="info.moderator") модератор
@@ -24,10 +24,10 @@
           simple-svg(:filepath="'/static/img/sidebar/im.svg'")
         .friends-block__actions-block.delete(v-tooltip.bottom="'Удалить из друзей'" @click="openModal('delete')" v-if="info.friend")
           simple-svg(:filepath="'/static/img/delete.svg'")
-        //- .friends-block__actions-block.add(v-tooltip.bottom="'отправить запрос в друзья'" @click="apiRequestFriends(info.id)" v-else-if="!info.friend")
-        //-   simple-svg(:filepath="'/static/img/friend-add.svg'")
-        .friends-block__actions-block.add(v-tooltip.bottom="'Добавить в друзья'" @click="apiAddFriends(info.id)" v-else)
+        .friends-block__actions-block.add(v-tooltip.bottom="'отправить запрос в друзья'" @click="apiAddFriends(info.id)" v-else-if="!info.friend")
           simple-svg(:filepath="'/static/img/friend-add.svg'")
+        //- .friends-block__actions-block.add(v-tooltip.bottom="'Добавить в друзья'" @click="apiRequestFriends(info.id)" v-else)
+        //-   simple-svg(:filepath="'/static/img/friend-add.svg'")
         .friends-block__actions-block(v-tooltip.bottom="'Заблокировать'" @click="openModal('blocked')")
           simple-svg(:filepath="'/static/img/friend-blocked.svg'")
     modal(v-model="modalShow")
@@ -117,6 +117,9 @@ export default {
 
   img {
     width: 100%;
+    max-width 100%
+    height 100%
+    object-fit cover
   }
 }
 

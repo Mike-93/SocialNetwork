@@ -18,7 +18,7 @@
       .news-block__author(v-if="!deffered")
         router-link.news-block__author-pic(:to="{name: 'ProfileId', params: {id: info.author.id}}")
           img(v-if="info.author.photo" :src="info.author.photo" :alt="info.author.first_name")
-          img(v-else src="/static/img/user/admin.png" :alt="info.author.first_name")
+          img(v-else src="/static/img/user/2.webp" :alt="info.author.first_name")
         .news-block__author-info
           router-link.news-block__author-name(:to="{name: 'ProfileId', params: {id: info.author.id}}") {{info.author.first_name + ' ' + info.author.last_name}}
           span.news-block__author-time {{info.time | moment("from")}}
@@ -215,6 +215,9 @@ export default {
 
   img {
     width: 100%;
+    max-width 100%
+    height 100%
+    object-fit cover
   }
 }
 

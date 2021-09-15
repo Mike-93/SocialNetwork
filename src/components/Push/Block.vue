@@ -2,7 +2,7 @@
   .push-block
     .push__img
       img(v-if="info.entity_author.photo" :src="info.entity_author.photo" :alt="info.entity_author.first_name")
-      img(v-else src="/static/img/user/1.jpg" :alt="info.entity_author.first_name")
+      img(v-else src="/static/img/user/2.webp" :alt="info.entity_author.first_name")
     p.push__content
       router-link.push__content-name(:to="getRouteByNotification(info)")
         | {{info.entity_author.first_name + ' ' + info.entity_author.last_name}}

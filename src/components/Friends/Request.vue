@@ -20,7 +20,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('profile/friends', ['apiAddFriends', 'apiRequest'])
+    ...mapActions('profile/friends', ['apiAddFriends'])
   },
   mounted() {
     if (this.requestFriends.length === 0) this.apiRequest()
@@ -54,7 +54,10 @@ export default {
 
   img {
     width: 100%;
-  }s
+    max-width 100%
+    height 100%
+    object-fit cover
+  }
 }
 
 .friends-application__list {
