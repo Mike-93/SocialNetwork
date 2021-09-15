@@ -5,10 +5,7 @@ import application.exceptions.PasswordNotValidException;
 import application.exceptions.PasswordsNotEqualsException;
 import application.models.dto.MessageResponseDto;
 import application.models.dto.NotificationsSettingsDto;
-import application.models.requests.RecoverPassDtoRequest;
-import application.models.requests.RegistrationDtoRequest;
-import application.models.requests.SetPasswordDtoRequest;
-import application.models.requests.ShiftEmailDtoRequest;
+import application.models.requests.*;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import application.service.AccountService;
@@ -31,38 +28,55 @@ public class AccountController {
     public ResponseEntity<GeneralResponse<MessageResponseDto>> register(@RequestBody RegistrationDtoRequest request)
             throws EmailAlreadyExistsException, PasswordsNotEqualsException {
 
-        return accountService.register(request);
+        return ResponseEntity.ok(new GeneralResponse<>(accountService.register(request)));
     }
 
     @PutMapping("/password/set")
     public ResponseEntity<GeneralResponse<MessageResponseDto>> setPassword(HttpServletRequest servletRequest,
                                                                            @RequestBody SetPasswordDtoRequest request)
             throws PasswordNotValidException {
+
         request.setToken(AccountService.getCode(servletRequest));
-        return accountService.setPassword(request);
+        return ResponseEntity.ok(new GeneralResponse<>(accountService.setPassword(request)));
     }
 
     @PutMapping("/email")
     public ResponseEntity<GeneralResponse<MessageResponseDto>> setEmail(HttpServletRequest servletRequest,
                                                                         @RequestBody ShiftEmailDtoRequest request) {
-        return accountService.setEmail(request, AccountService.getCode(servletRequest));
+
+        return ResponseEntity.ok(new GeneralResponse<>(accountService.setEmail(request,
+                AccountService.getCode(servletRequest))));
     }
 
     @PutMapping("/password/recovery")
     public ResponseEntity<GeneralResponse<MessageResponseDto>> recoverPassword(
             HttpServletRequest servletRequest, @RequestBody RecoverPassDtoRequest request)
             throws MessagingException, UnsupportedEncodingException {
-        return accountService.recoverPassword(servletRequest, request);
+
+        return ResponseEntity.ok(new GeneralResponse<>(accountService.recoverPassword(servletRequest, request)));
     }
 
     @PutMapping("/shift-email")
     public ResponseEntity<GeneralResponse<MessageResponseDto>> changeEmail(HttpServletRequest servletRequest)
             throws MessagingException, UnsupportedEncodingException {
-        return accountService.changeEmail(servletRequest);
+
+        return ResponseEntity.ok(new GeneralResponse<>(accountService.changeEmail(servletRequest)));
     }
 
     @GetMapping("/notifications")
-    public ResponseEntity<GeneralListResponse<NotificationsSettingsDto>> getAccountNotifications() {
-        return ResponseEntity.ok(accountService.getPersonNotificationsSettings());
+    public ResponseEntity<GeneralListResponse<NotificationsSettingsDto>> getAccountNotifications(
+            @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
+            @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
+
+        return ResponseEntity.ok(new GeneralListResponse<>(
+                accountService.getPersonNotificationsSettings(), offset, itemPerPage));
     }
+
+    @PutMapping("/notifications")
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> setAccountNotifications(
+            @RequestBody NotificationRequest notificationRequest) {
+
+        return ResponseEntity.ok(new GeneralResponse<>(accountService.setNotificationSettings(notificationRequest)));
+    }
+
 }

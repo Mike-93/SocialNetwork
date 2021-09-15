@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS person
     last_name           TEXT   NOT NULL,
     reg_date            BIGINT NOT NULL,
     birth_date          BIGINT,
-    e_mail              TEXT   NOT NULL,
+    e_mail              TEXT   NOT NULL UNIQUE,
     phone               TEXT,
     password            TEXT   NOT NULL,
     photo               TEXT,
@@ -51,14 +51,6 @@ CREATE TABLE IF NOT EXISTS friendship_status
     time BIGINT NOT NULL,
     name TEXT   NOT NULL,
     code TEXT   NOT NULL,
-    PRIMARY KEY (id)
-);
-
-CREATE TABLE IF NOT EXISTS notification_type
-(
-    id   SERIAL NOT NULL,
-    code TEXT   NOT NULL,
-    name TEXT   NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -128,10 +120,10 @@ CREATE TABLE IF NOT EXISTS post_like
     id        SERIAL NOT NULL,
     time      BIGINT NOT NULL,
     person_id INT    NOT NULL,
-    post_id   INT    NOT NULL,
+    item_id   INT    NOT NULL,
+    type      TEXT   NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (person_id) REFERENCES person (id) ON DELETE RESTRICT,
-    FOREIGN KEY (post_id) REFERENCES post (id) ON DELETE RESTRICT
+    FOREIGN KEY (person_id) REFERENCES person (id) ON DELETE RESTRICT
 );
 
 CREATE TABLE IF NOT EXISTS post_file
@@ -156,15 +148,17 @@ CREATE TABLE IF NOT EXISTS post2tag
 
 CREATE TABLE IF NOT EXISTS notification
 (
-    id        SERIAL NOT NULL,
-    type_id   INT    NOT NULL,
-    send_time BIGINT NOT NULL,
-    person_id INT    NOT NULL,
-    entity_id INT    NOT NULL,
-    contact   TEXT   NOT NULL,
+    id            SERIAL NOT NULL,
+    send_time     BIGINT NOT NULL,
+    person_id     INT    NOT NULL,
+    entity_id     INT    NOT NULL,
+    contact       TEXT   NOT NULL,
+    src_person_id INT    NOT NULL,
+    type          TEXT   NOT NULL,
+    name          TEXT   NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (person_id) REFERENCES person (id) ON DELETE RESTRICT,
-    FOREIGN KEY (type_id) REFERENCES notification_type (id) ON DELETE RESTRICT
+    FOREIGN KEY (src_person_id) REFERENCES person (id) ON DELETE RESTRICT
 );
 
 CREATE TABLE IF NOT EXISTS notification_setting_type

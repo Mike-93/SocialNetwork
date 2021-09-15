@@ -13,5 +13,6 @@ public class FileDescription {
   private String fileFormat;
   private int bytes;
   private String fileType;
+  private byte[] data;
   private long createdAt;
 }
