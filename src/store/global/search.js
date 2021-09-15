@@ -110,7 +110,7 @@ export default {
     }, text) {
       commit('setSearchText', text)
       await dispatch('searchUsers', {
-        first_name: text
+        first_or_last_name: text
       })
       await dispatch('searchNews', {
         text
