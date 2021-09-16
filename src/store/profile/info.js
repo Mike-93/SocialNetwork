@@ -14,7 +14,6 @@ export default {
       }
       result.fullName = result.first_name + ' ' + result.last_name
       result.ages = moment().diff(result.birth_date, 'years')
-      result.photo = '/static/img/user/2.webp'
       return result
     }
   },

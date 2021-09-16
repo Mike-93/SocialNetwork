@@ -3,7 +3,7 @@
     .inner-page__main
       .profile__info
         profile-info(me online :info="getInfo")
-      .profile__news(v-if="getWall.length > 0")
+      .profile__news
         .profile__tabs
           span.profile__tab(@click="changeTab('POSTED')" :class="{active: activeTab === 'published'}") Мои публикации ({{getWallPostedLength}})
           span.profile__tab(@click="changeTab('QUEUED')" :class="{active: activeTab === 'queue'}" v-if="getWallQueuedLength > 0") Отложенные публикации ({{getWallQueuedLength}})

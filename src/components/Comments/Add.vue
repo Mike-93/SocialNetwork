@@ -1,7 +1,8 @@
 <template lang="pug">
   form.comment-add(action="#" @submit.prevent="onSubmitComment")
     .comment-add__pic(v-if="getInfo")
-      img(:src="getInfo.photo" :alt="getInfo.fullName")
+      img(v-if="getInfo.photo" :src="getInfo.photo" :alt="getInfo.fullName")
+      img(v-else src="/static/img/user/2.webp" :alt="getInfo.fullName")
     input.comment-add__input(type="text" placeholder="Написать комментарий..." ref="addInput" v-model="commentText")
     .comment-add__icon.photo
       simple-svg(:filepath="'/static/img/photo.svg'")

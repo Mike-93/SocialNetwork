@@ -111,7 +111,7 @@ export default {
       }).then(response => {
         dispatch('global/alert/setAlert', {
           status: 'success',
-          text: 'ok'
+          text: 'Друг добавлен'
         }, {
           root: true
         })

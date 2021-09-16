@@ -10,7 +10,8 @@
         push(:isOpen="isOpenPush && getNotificationsLength > 0" @close-push="togglePush")
     router-link.main-layout__user(v-if="getInfo" :to="{name: 'Profile'}")
       .main-layout__user-pic
-        img(:src="getInfo.photo" :alt="getInfo.fullName")
+        img(v-if="getInfo.photo" :src="getInfo.photo" :alt="getInfo.fullName")
+        img(v-else src="/static/img/user/2.webp" :alt="getInfo.fullName")
       span.main-layout__user-name {{getInfo.fullName}}
       span.main-layout__user-post(v-if="isAdminPage") - администратор
 </template>

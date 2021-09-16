@@ -22,12 +22,10 @@
       template(v-else)
         .friends-block__actions-block.message(v-tooltip.bottom="'Написать сообщение'" @click="sendMessage(info.id)")
           simple-svg(:filepath="'/static/img/sidebar/im.svg'")
-        .friends-block__actions-block.delete(v-tooltip.bottom="'Удалить из друзей'" @click="openModal('delete')" v-if="info.friend")
+        .friends-block__actions-block.delete(v-tooltip.bottom="'Удалить из друзей'" @click="openModal('delete')" v-if="friends")
           simple-svg(:filepath="'/static/img/delete.svg'")
-        .friends-block__actions-block.add(v-tooltip.bottom="'отправить запрос в друзья'" @click="apiAddFriends(info.id)" v-else-if="!info.friend")
+        .friends-block__actions-block.add(v-tooltip.bottom="'отправить запрос в друзья'" @click="apiAddFriends(info.id)" v-else)
           simple-svg(:filepath="'/static/img/friend-add.svg'")
-        //- .friends-block__actions-block.add(v-tooltip.bottom="'Добавить в друзья'" @click="apiRequestFriends(info.id)" v-else)
-        //-   simple-svg(:filepath="'/static/img/friend-add.svg'")
         .friends-block__actions-block(v-tooltip.bottom="'Заблокировать'" @click="openModal('blocked')")
           simple-svg(:filepath="'/static/img/friend-blocked.svg'")
     modal(v-model="modalShow")
@@ -50,6 +48,15 @@ export default {
   }),
   computed: {
     ...mapGetters('profile/dialogs', ['dialogs']),
+    ...mapGetters('profile/friends', ['getResultById']),
+
+    friends() {
+      return this.getResultById.first_name !== 0
+        ? this.getResultById('friends')
+        : this.getResultById('friends').find(
+            el => el.id === include(this.getResultById.id)
+          )
+    },
 
     modalText() {
       return this.modalType === 'delete'
@@ -60,7 +67,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions('profile/friends', ['apiAddFriends', 'apiRequestFriends', 'apiDeleteFriends']),
+    ...mapActions('profile/friends', ['apiAddFriends', 'apiDeleteFriends', 'apiFriends']),
     ...mapActions('profile/dialogs', ['openDialog']),
     ...mapActions('users/actions', ['apiBlockUser', 'apiUnblockUser']),
     closeModal() {

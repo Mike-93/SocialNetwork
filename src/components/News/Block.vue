@@ -29,7 +29,7 @@
           a.news-block__content-more(href="#" v-if="isLotText" @click.prevent="toggleText")
             template(v-if="openText") Скрыть
             template(v-else) Читать весь пост
-        ul.news-block__content-tags
+        ul.news-block__content-tags(v-if="info.tags.length")
           li.news-block__content-tag(v-for="(tag,index) in info.tags" :key="index") {{'#'+tag}}
       .news-block__actions(v-if="!deffered && !admin")
         .news-block__actions-block

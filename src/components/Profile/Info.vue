@@ -2,7 +2,8 @@
   .profile-info(v-if="info")
     .profile-info__pic
       .profile-info__img(:class="{offline: !online && !me}")
-        img(:src="info.photo" :alt="info.fullName")
+        img(v-if="info.photo" :src="info.photo" :alt="info.fullName")
+        img(v-else src="/static/img/user/2.webp" :alt="info.fullName")
       .profile-info__actions(v-if="!me")
         button-hover(:disable="blocked" @click.native="onSentMessage") Написать сообщение
         button-hover.profile-info__add(:variant="btnVariantInfo.variant" bordered  @click.native="profileAction") {{btnVariantInfo.text}}
