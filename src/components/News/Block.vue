@@ -104,7 +104,7 @@ export default {
   },
   methods: {
     ...mapActions('global/likes', ['putLike', 'deleteLike']),
-    ...mapActions('profile/feeds', ['deleteFeeds']),
+    // ...mapActions('profile/feeds', ['deleteFeeds']),
     toggleText() {
       this.openText = !this.openText
     },

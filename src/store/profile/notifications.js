@@ -53,7 +53,7 @@ export default {
         // добавить когда будет прод
         setTimeout(() => {
           dispatch('apiNotifications')
-        }, 5000)
+        }, 500000)
 
       }).catch(() => {})
     },

@@ -57,6 +57,7 @@ export default {
         url: `users/${id}`,
         method: 'GET'
       }).then(response => {
+        console.log(response.data.data)
         commit('setInfo', response.data.data)
       }).catch(error => {})
     },

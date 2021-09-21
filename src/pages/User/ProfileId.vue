@@ -2,7 +2,11 @@
   .profile.inner-page(v-if="getUsersInfo")
     .inner-page__main
       .profile__info
-        profile-info(:info="getUsersInfo" :blocked="getUsersInfo.is_blocked" :friend="getUsersInfo.is_friend" :online="getUsersInfo.is_onlined")
+        profile-info(
+          :info="getUsersInfo"
+          :blocked="getUsersInfo.is_blocked"
+          :friend="getUsersInfo.is_friend"
+          :online="getUsersInfo.is_onlined")
       .profile__news
         .profile__tabs
           span.profile__tab.active Публикации {{getUsersInfo.first_name}} ({{getWall.length}})

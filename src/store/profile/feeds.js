@@ -3,13 +3,16 @@ import axios from 'axios'
 export default {
   namespaced: true,
   state: {
-    feeds: []
+    feeds: [],
+    totalFeeds: null,
   },
   getters: {
-    getFeeds: s => s.feeds
+    getFeeds: s => s.feeds,
+    getTotalFeeds: s => s.totalFeeds,
   },
   mutations: {
     setFeeds: (s, feeds) => s.feeds = feeds,
+    setTotalFeeds: (s, totalFeeds) => s.totalFeeds = totalFeeds,
     setCommentsById: (s, payload) => {
       s.feeds[s.feeds.indexOf(s.feeds.find(el => el.id === payload.post_id))].comments = payload.value
       s.feeds.push('dog-nail')
@@ -26,11 +29,12 @@ export default {
         payload[el] && query.push(`${el}=${payload[el]}`)
       })
       await axios({
-        url: `feeds?${query.join('&')}`,
+        url: `feeds?${query.join('&')}itemPerPage=5`,
         method: 'GET'
       }).then(response => {
         console.log("TCL: apiFeeds -> response", response)
         commit('setFeeds', response.data.data)
+        commit('setTotalFeeds', response.data.total)
       }).catch(() => {})
     },
     async apiFeedsById({
