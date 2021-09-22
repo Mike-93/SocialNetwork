@@ -33,15 +33,8 @@ export default {
     first_name: '',
   }),
   computed: {
-    // ...mapGetters('profile/friends', ['getResultById']),
     ...mapGetters('profile/friends', ['getResult']),
-    // friends() {
-      // return this.first_name.length === 0
-      //   ? this.getResultById('friends')
-      //   : this.getResultById('friends').filter(
-      //       el => el.first_name.toLowerCase().indexOf(this.first_name.toLowerCase()) !== -1
-      //     )
-    // },
+
     userFriends() {
       return this.getResult;
     },
@@ -55,7 +48,6 @@ export default {
     }
   },
   methods: {
-    // ...mapActions('profile/friends', ['apiFriends', 'apiRequestFriends'])
     ...mapActions('profile/friends', ['apiRequestFriends', 'apiResultFriends'])
   },
   mounted() {
@@ -68,6 +60,4 @@ export default {
   //   })
   // }
 }
-// this.apiRequestFriends()
-
 </script>

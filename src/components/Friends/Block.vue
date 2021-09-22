@@ -22,7 +22,7 @@
       template(v-else)
         .friends-block__actions-block.message(v-tooltip.bottom="'Написать сообщение'" @click="sendMessage(info.id)")
           simple-svg(:filepath="'/static/img/sidebar/im.svg'")
-        .friends-block__actions-block.delete(v-tooltip.bottom="'Удалить из друзей'" @click="openModal('delete')" v-if="friends")
+        .friends-block__actions-block.delete(v-tooltip.bottom="'Удалить из друзей'" @click="openModal('delete')" v-if="friends === info.id")
           simple-svg(:filepath="'/static/img/delete.svg'")
         .friends-block__actions-block.add(v-tooltip.bottom="'отправить запрос в друзья'" @click="apiAddFriends(info.id)" v-else)
           simple-svg(:filepath="'/static/img/friend-add.svg'")
@@ -44,18 +44,24 @@ export default {
   components: { Modal },
   data: () => ({
     modalShow: false,
-    modalType: 'delete'
+    modalType: 'delete',
   }),
   computed: {
     ...mapGetters('profile/dialogs', ['dialogs']),
-    ...mapGetters('profile/friends', ['getResultById']),
+    ...mapGetters('profile/friends', ['getResult', 'getResultById']),
 
     friends() {
-      return this.getResultById.first_name !== 0
-        ? this.getResultById('friends')
-        : this.getResultById('friends').find(
-            el => el.id === include(this.getResultById.id)
-          )
+      const friendsArr = this.getResultById('friends');
+
+      if (!friendsArr) return;
+
+      for (let i = 0; i < friendsArr.length; ++i) {
+        const friendId = friendsArr[i].id;
+        if (friendId === this.info.id) {
+          return friendId
+        }
+      }
+      return friendsArr;
     },
 
     modalText() {
@@ -86,8 +92,12 @@ export default {
         : this.modalType === 'deleteModerator'
         ? console.log('delete moderator')
         : this.apiBlockUser(id).then(() => this.closeModal())
-    }
-  }
+    },
+    ...mapActions('profile/friends', ['apiResultFriends'])
+  },
+  mounted() {
+    if (this.friends.length === 0) this.apiResultFriends()
+  },
 }
 </script>
 

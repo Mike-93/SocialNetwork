@@ -14,15 +14,16 @@
         .search__row
           select.select.friends-search__select(v-model.number="age_from")
             option(value="null" disabled) От
-            option(value="31") От 31
-            option(value="32") От 32
-            option(value="33") От 33
+            option(value="18") От 18
+            option(value="30") От 30
+            option(value="45") От 45
+            option(value="") Все
           span.search__age-defis —
           select.select.friends-search__select(v-model.number="age_to")
             option(value="null" disabled) До
-            option(value="34") До 34
-            option(value="35") До 35
-            option(value="36") До 36
+            option(value="45") До 45
+            option(value="") Все
+            //- option(value="36") До 36
       //- .friends-search__block
       //-   label.search__label Регион:
       //-   .search__row
@@ -36,6 +37,22 @@
       //-       option Москва
       //-       option Лондон
       //-       option Техас
+      .friends-search__block
+        label.search__label Регион:
+        .search__row
+          select.select.friends-search__select(v-model="country_id")
+            option(value="null" disabled) Страна
+            option(value="Россия") Россия
+            option(value="Англия") Англия
+            option(value="США") США
+            option(value="") Все
+
+          select.select.friends-search__select(v-model="city_id")
+            option(value="null" disabled) Город
+            option(value="Москва") Москва
+            option(value="Лондон") Лондон
+            option(value="Техас") Техас
+            option(value="") Все
     button.friends-possible__btn(type="submit")
       simple-svg(:filepath="'/static/img/search.svg'")
       span.friends-possible__link Искать друзей
@@ -58,8 +75,8 @@ export default {
   methods: {
     ...mapActions('global/search', ['searchUsers', 'clearSearch']),
     onSearchUsers() {
-      let { first_name, last_name, age_from, age_to, country, city } = this
-      this.searchUsers({ first_name, last_name, age_from, age_to, country, city })
+      let { first_name, last_name, age_from, age_to, country_id, city_id } = this;
+      this.searchUsers({ first_name, last_name, age_from, age_to, country_id, city_id })
     }
   },
   beforeDestroy() {
