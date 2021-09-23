@@ -7,13 +7,14 @@ export default {
   state: {
     info: null,
     wall: [],
-    users: null
+    users: null,
   },
   getters: {
     getInfo(state) {
       if (!state.info) return
       let result = {
-        ...state.info
+        ...state.info,
+        storage: 'sadsad'
       }
       // если понадобиться то добавить склонение (для публикаций, но нужен или пол или отчество)
       // библиотека - petrovich
@@ -57,7 +58,6 @@ export default {
         url: `users/${id}`,
         method: 'GET'
       }).then(response => {
-        console.log(response.data.data)
         commit('setInfo', response.data.data)
       }).catch(error => {})
     },

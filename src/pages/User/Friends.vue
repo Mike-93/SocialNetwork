@@ -54,10 +54,10 @@ export default {
     if (this.requestFriends.length === 0) this.apiRequestFriends()
     if (this.resultFriends.length === 0) this.apiResultFriends()
   },
-  // beforeRouteEnter(to, from, next) {
-  //   next(vm => {
-  //     vm.apiFriends()
-  //   })
-  // }
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.apiFriends()
+    })
+  }
 }
 </script>

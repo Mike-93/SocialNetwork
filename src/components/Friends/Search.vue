@@ -16,42 +16,23 @@
             option(value="null" disabled) От
             option(value="18") От 18
             option(value="30") От 30
-            option(value="45") От 45
             option(value="") Все
           span.search__age-defis —
           select.select.friends-search__select(v-model.number="age_to")
             option(value="null" disabled) До
-            option(value="45") До 45
+            option(value="45") До 50
             option(value="") Все
-            //- option(value="36") До 36
-      //- .friends-search__block
-      //-   label.search__label Регион:
-      //-   .search__row
-      //-     select.select.friends-search__select(v-model="country")
-      //-       option(value="null" disabled) Страна
-      //-       option Россия
-      //-       option Англия
-      //-       option США
-      //-     select.select.friends-search__select(v-model="city")
-      //-       option(value="null" disabled) Город
-      //-       option Москва
-      //-       option Лондон
-      //-       option Техас
       .friends-search__block
         label.search__label Регион:
         .search__row
           select.select.friends-search__select(v-model="country_id")
             option(value="null" disabled) Страна
-            option(value="Россия") Россия
-            option(value="Англия") Англия
-            option(value="США") США
+            option(v-for="country in this.getCountries" :key="country.id") {{ country.title }}
             option(value="") Все
 
           select.select.friends-search__select(v-model="city_id")
             option(value="null" disabled) Город
-            option(value="Москва") Москва
-            option(value="Лондон") Лондон
-            option(value="Техас") Техас
+            option(v-for="city in this.getCities" :key="city.id") {{ city.title }}
             option(value="") Все
     button.friends-possible__btn(type="submit")
       simple-svg(:filepath="'/static/img/search.svg'")
@@ -59,7 +40,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 export default {
   name: 'FriendsSearch',
   data: () => ({
@@ -70,17 +51,27 @@ export default {
     country_id: null,
     city_id: null,
     offset: 0,
-    itemPerPage: 20
+    itemPerPage: 20,
   }),
+  computed: {
+    ...mapGetters('platform/countries', ['getCountries']),
+    ...mapGetters('platform/cities', ['getCities']),
+  },
   methods: {
     ...mapActions('global/search', ['searchUsers', 'clearSearch']),
+    ...mapActions('platform/countries', ['apiCountries']),
+    ...mapActions('platform/cities', ['apiCities']),
     onSearchUsers() {
       let { first_name, last_name, age_from, age_to, country_id, city_id } = this;
       this.searchUsers({ first_name, last_name, age_from, age_to, country_id, city_id })
-    }
+    },
   },
   beforeDestroy() {
     this.clearSearch()
+  },
+  created() {
+    this.apiCountries();
+    this.apiCities();
   }
 }
 </script>

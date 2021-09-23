@@ -35,13 +35,13 @@ export default {
     }
   },
   methods: {
-    ...mapActions('users/info', ['apiWallById']),
+    ...mapActions('users/info', ['apiWall']),
     changeTab(tab) {
       this.activeTab = tab
     }
   },
   created() {
-    if (this.getInfo) this.apiWallById({ id: this.getInfo.id })
+    if (this.getInfo) this.apiWall({ id: this.getInfo.id })
   }
 }
 </script>
