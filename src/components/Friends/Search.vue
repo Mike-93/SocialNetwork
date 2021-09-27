@@ -5,10 +5,12 @@
       .friends-search__row
         .friends-search__block
           label.search__label(for="friends-search-name") Имя:
-          input.search__input(type="text" id="friends-search-name" v-model="first_name")
+          input.search__input(type="text" id="friends-search-name" v-model.trim="$v.first_name.$model")
+        .error(v-if="!$v.first_name.minLength") минимум {{$v.first_name.$params.minLength.min}} символа.
         .friends-search__block
           label.search__label(for="friends-search-lastname") Фамилия:
-          input.search__input(type="text" id="friends-search-lastname" v-model="last_name")
+          input.search__input(type="text" id="friends-search-lastname" v-model.trim="$v.last_name.$model")
+        .error(v-if="!$v.last_name.minLength") минимум {{$v.last_name.$params.minLength.min}} символа.
       .friends-search__block
         label.search__label Возраст:
         .search__row
@@ -27,51 +29,70 @@
         .search__row
           select.select.friends-search__select(v-model="country_id")
             option(value="null" disabled) Страна
-            option(v-for="country in this.getCountries" :key="country.id") {{ country.title }}
+            option(v-for="country in this.getCountries" :value="country.id" :key="country.id") {{ country.title }}
             option(value="") Все
 
           select.select.friends-search__select(v-model="city_id")
             option(value="null" disabled) Город
-            option(v-for="city in this.getCities" :key="city.id") {{ city.title }}
+            option(v-for="city in this.getDefaultCities" :key="city.id") {{ city.title }}
             option(value="") Все
-    button.friends-possible__btn(type="submit")
+    button.friends-possible__btn(
+      type="submit"
+      :disabled="!$v.last_name.required || !$v.first_name.required || !$v.last_name.minLength || !$v.first_name.minLength"
+      )
       simple-svg(:filepath="'/static/img/search.svg'")
       span.friends-possible__link Искать друзей
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapMutations } from 'vuex'
+import { required, minLength } from 'vuelidate/lib/validators'
+import NameField from '@/components/FormElements/NameField'
+
 export default {
   name: 'FriendsSearch',
+  components: { NameField },
   data: () => ({
-    first_name: null,
-    last_name: null,
+    first_name: '',
+    last_name: '',
     age_from: null,
     age_to: null,
     country_id: null,
     city_id: null,
     offset: 0,
     itemPerPage: 20,
+    submitStatus: null
   }),
   computed: {
     ...mapGetters('platform/countries', ['getCountries']),
-    ...mapGetters('platform/cities', ['getCities']),
+    ...mapGetters('platform/cities', ['getCities', 'getDefaultCities']),
   },
   methods: {
     ...mapActions('global/search', ['searchUsers', 'clearSearch']),
     ...mapActions('platform/countries', ['apiCountries']),
-    ...mapActions('platform/cities', ['apiCities']),
+    ...mapMutations('platform/cities', ['setDefaultCities']),
+    // ...mapActions('platform/cities', ['apiCities']),
     onSearchUsers() {
+      if (this.$v.$invalid) {
+        this.$v.$touch()
+        this.submitStatus = 'ERROR'
+        return
+      }
+      this.submitStatus = 'OK'
       let { first_name, last_name, age_from, age_to, country_id, city_id } = this;
       this.searchUsers({ first_name, last_name, age_from, age_to, country_id, city_id })
     },
+  },
+  validations: {
+    first_name: { required, minLength: minLength(3) },
+    last_name: { required, minLength: minLength(3) }
   },
   beforeDestroy() {
     this.clearSearch()
   },
   created() {
     this.apiCountries();
-    this.apiCities();
+    // this.apiCities();
   }
 }
 </script>
@@ -118,5 +139,15 @@ export default {
   &+& {
     margin-left: 12px;
   }
+}
+
+.error {
+  color red
+  font-size 12px
+}
+
+.friends-possible__btn:disabled {
+  opacity .5
+  cursor not-allowed
 }
 </style>

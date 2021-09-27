@@ -1,7 +1,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 
-const INTERVAL_DIALOG_MS = 500000;
+const INTERVAL_DIALOG_MS = 5000;
 // const INTERVAL_NOTIFICATIONS_MS = 5000;
 
 export default {

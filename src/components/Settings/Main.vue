@@ -89,8 +89,6 @@ export default {
     ...mapActions('global/storage', ['apiStorage']),
     ...mapActions('profile/info', ['apiChangeInfo']),
     submitHandler() {
-      if (!this.src) return;
-
       if (this.photo) {
         this.apiStorage(this.photo).then(() => {
           this.apiChangeInfo({
@@ -105,8 +103,8 @@ export default {
           })
         })
       } else {
-          this.apiChangeInfo({
-          photo_id: this.getStorage && this.getStorage.id,
+        this.apiChangeInfo({
+          photo_id: this.getInfo && this.getInfo.id,
           first_name: this.name,
           last_name: this.lastName,
           birth_date: moment([this.year, this.month.val - 1, this.day]).format(),
