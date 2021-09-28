@@ -39,6 +39,8 @@ export default {
 
   &.error {
     background-color: wild-watermelon;
+    color: #fff;
+    font-size: 14px;
   }
 }
 </style>

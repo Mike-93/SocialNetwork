@@ -253,5 +253,6 @@ export default {
 .profile-info__val {
   color: #747487;
   line-height: 25px;
+  width: 450px;
 }
 </style>
