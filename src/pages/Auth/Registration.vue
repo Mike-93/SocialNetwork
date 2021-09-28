@@ -76,8 +76,8 @@ export default {
     email: { required, email },
     passwd1: { required, minLength: minLength(8) },
     passwd2: { required, minLength: minLength(8), sameAsPassword: sameAs('passwd1') },
-    firstName: { required, minLength: minLength(3) },
-    lastName: { required, minLength: minLength(3) },
+    firstName: { required, minLength: minLength(2) },
+    lastName: { required, minLength: minLength(2) },
     number: {
       required,
       numeric,

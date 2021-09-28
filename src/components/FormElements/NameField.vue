@@ -3,7 +3,7 @@
     input.form__input(:id="id" v-model="name" name="name" :class="{invalid: (v.$dirty && !v.required) || (v.$dirty && !v.minLength)}" @change="v.$touch()")
     label.form__label(:for="id") {{label}}
     span.form__error(v-if="v.$dirty && !v.required") Обязательно поле
-    span.form__error(v-else-if="v.$dirty && !v.minLength") Минимальное количество символов {{v.minLength}}
+    span.form__error(v-else-if="v.$dirty && !v.minLength") Минимальное количество символов {{v.$params.minLength.min}}
 </template>
 
 <script>
