@@ -5,7 +5,7 @@
       .main-layout__admin-logo(v-if="isAdminPage")
         simple-svg(:filepath="'/static/img/logo-admin.svg'")
     nav.main-layout__nav
-      router-link.main-layout__link(v-for="(item,index) in info" :key="index" :exact="item.exact" :to="item.link" :class="{'main-layout__link--im': item.link.name === 'Im', 'big': unreadedMessages >= 100}" :data-push="item.link.name === 'Im' ? unreadedMessages : false")
+      router-link.main-layout__link(v-for="(item,index) in info" :key="index" :exact="item.exact" :to="item.link" :class="{'main-layout__link--im': item.link.name === 'Im', 'big': unreadedMessages >= 100, 'unreaded': unreadedMessages > 0}" :data-push="unreadedMessages")
         img(:src="`/static/img/sidebar/admin/${item.icon}.png`" :alt="item.text" v-if="isAdminPage")
         simple-svg(:filepath="`/static/img/sidebar/${item.icon}.svg`" v-else)
         span {{item.text}}
@@ -111,28 +111,31 @@ export default {
   }
 
   &--im {
-    &:after {
-      content: attr(data-push);
-      font-weight: 600;
-      font-size: 13px;
-      width: 23px;
-      height: 23px;
-      background-color: #E65151;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-    }
 
-    &.big {
+    &.unreaded {
       &:after {
-        width: 35px;
-        height: 35px;
-        right: 5px;
+        content: attr(data-push);
+        font-weight: 600;
+        font-size: 13px;
+        width: 23px;
+        height: 23px;
+        background-color: #E65151;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+
+      &.big {
+        &:after {
+          width: 35px;
+          height: 35px;
+          right: 5px;
+        }
       }
     }
 
