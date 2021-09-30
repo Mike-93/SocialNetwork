@@ -38,8 +38,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/api/v1/account/register",
             "/api/v1/account/password/*",
             "/api/v1/account/email",
-            "/storage/*"
-            // other public endpoints of your API may be appended to this array
+            "/profile/storage/*",
+            "/storage/*",
+            "api/v1/admin/login"
     };
 
 

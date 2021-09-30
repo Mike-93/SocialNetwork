@@ -12,11 +12,15 @@ import application.service.ProfileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Size;
 import java.text.ParseException;
 
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -36,12 +40,13 @@ public class ProfileController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GeneralResponse<PersonDto>> getPerson(@PathVariable int id) {
+    public ResponseEntity<GeneralResponse<PersonDto>> getPerson(
+            @PathVariable int id) {
 
         log.info("getPerson(id): start():");
         log.debug("getPerson(id), id = {}", id);
         GeneralResponse<PersonDto> profile = new GeneralResponse<>(profileService.getPerson(id));
-        log.debug("getPerson(id): , response = {}", id, profile);
+        log.debug("getPerson({}): , response = {}", id, profile);
         log.info("getPerson(id = {}): finish():", id);
         return ResponseEntity.ok(profile);
     }
@@ -58,13 +63,13 @@ public class ProfileController {
                 (profileService.getWall(id), offset, itemPerPage);
         log.debug("getWall(id = {}), response = {}", id, response);
         log.info("getPWall(id = {}): finish():", id);
-
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<GeneralListResponse<PersonDto>> getPersons(
-            @RequestParam(value = "first_or_last_name", required = false) String firstOrLastName,
+    public ResponseEntity<GeneralListResponse<PersonDto>> searchPersons(
+            @RequestParam(value = "first_or_last_name", required = false) @Size(min = 2,
+                    message = "{search.text.not.valid}") String firstOrLastName,
             @RequestParam(value = "first_name", required = false) String firstName,
             @RequestParam(value = "last_name", required = false) String lastName,
             @RequestParam(value = "age_from", required = false) Long ageFrom,
@@ -76,10 +81,10 @@ public class ProfileController {
 
         log.info("searchPerson: start():");
         log.debug("searchPerson: request: firstOrLastName = {}, firstName = {}, lastName = {}, " +
-                "ageFrom = {}, ageTo = {}, country = {}, city = {}", firstOrLastName, firstName, lastName,
+                        "ageFrom = {}, ageTo = {}, country = {}, city = {}", firstOrLastName, firstName, lastName,
                 ageFrom, ageTo, country, city);
         GeneralListResponse<PersonDto> response = new GeneralListResponse<>
-                (profileService.getPersons(firstOrLastName, firstName, lastName, ageFrom, ageTo, country, city),
+                (profileService.searchPersons(firstOrLastName, firstName, lastName, ageFrom, ageTo, country, city),
                         offset, itemPerPage);
         log.debug("searchPerson: response = {}", response);
         log.info("searchPerson: finish():");
@@ -88,14 +93,13 @@ public class ProfileController {
 
     @PutMapping("/me")
     public ResponseEntity<GeneralResponse<PersonDto>> updateProfile(
-            @RequestBody PersonSettingsDtoRequest request) throws ParseException, InterruptedException {
+            @RequestBody PersonSettingsDtoRequest request) throws ParseException {
 
         log.info("changeProfile: start():");
         log.debug("changeProfile: request = {}", request);
         GeneralResponse<PersonDto> response = new GeneralResponse<>(profileService.changeProfile(request));
         log.debug("changeProfile: response = {}", response);
         log.info("changeProfile: finish():");
-
         return ResponseEntity.ok(response);
     }
 
@@ -103,14 +107,13 @@ public class ProfileController {
     public ResponseEntity<GeneralResponse<Post>> addPost(
             @PathVariable int id,
             @RequestParam(value = "publish_date", required = false) Long publishDate,
-            @RequestBody PostRequest postRequest) {
+            @Valid @RequestBody PostRequest postRequest) {
 
         log.info("setPost: start():");
         log.debug("setPost: id = {}, postRequest = {}, publishDate = {}", id, postRequest, publishDate);
         GeneralResponse<Post> response = new GeneralResponse<>(profileService.setPost(id, publishDate, postRequest));
         log.debug("setPost: response = {}", response);
         log.info("setPost: finish():");
-
         return ResponseEntity.ok(response);
     }
 
@@ -122,7 +125,16 @@ public class ProfileController {
         GeneralResponse<MessageResponseDto> response = new GeneralResponse<>(profileService.deleteProfile());
         log.debug("deleteProfile: response = {}", response);
         log.info("deleteProfile: finish():");
+        return ResponseEntity.ok(response);
+    }
 
-        return ResponseEntity.ok(new GeneralResponse<>(profileService.deleteProfile()));
+    @PutMapping("/block/{id}")
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> blockUserForId(@PathVariable int id) {
+        return ResponseEntity.ok(new GeneralResponse<>(profileService.blockPersonForId(id)));
+    }
+
+    @DeleteMapping("/block/{id}")
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> unblockUser (@PathVariable int id) {
+        return ResponseEntity.ok(new GeneralResponse<>(profileService.unlockUser(id)));
     }
 }
