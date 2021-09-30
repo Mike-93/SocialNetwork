@@ -34,7 +34,7 @@
 
           select.select.friends-search__select(v-model="city_id")
             option(value="null" disabled) Город
-            option(v-for="city in this.getDefaultCities" :key="city.id") {{ city.title }}
+            option(v-for="city in this.getCities" :value="city.id" :key="city.id") {{ city.title }}
             option(value="") Все
     button.friends-possible__btn(
       type="submit"

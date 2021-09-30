@@ -7,8 +7,9 @@
       router-link.push__content-name(:to="getRouteByNotification(info)")
         | {{info.entity_author.first_name + ' ' + info.entity_author.last_name}}
         |
-        | {{getNotificationsTextType(info.event_type)}}
-      span.push__content-preview «{{info.info}}»
+        .push__content-event {{getNotificationsTextType(info.event_type)}}
+
+        span.push__content-preview(v-if="info.event_type != 'FRIEND_REQUEST'") «{{info.info}}»
     span.push__time {{info.sent_time | moment('from')}}
     button.push-block__close(@click="readNotification(info.id)" title="скрыть уведомление") Х
 </template>
@@ -37,7 +38,7 @@ export default {
 
 <style lang="stylus">
 .push-block {
-  position relative
+  position: relative;
   background: #fff;
   padding: 25px 30px;
   box-shadow: 0px 2px 60px rgba(0, 0, 0, 0.1);
@@ -53,12 +54,11 @@ export default {
 
   .push__content {
     max-width: 650px;
-    padding-top: 10px;
   }
 
   .push__content-name {
     display inline-block
-    margin-right 16px
+    margin-right 5px
   }
 
   .push__time {

@@ -51,8 +51,10 @@ export default {
     ...mapActions('profile/friends', ['apiRequestFriends', 'apiResultFriends'])
   },
   mounted() {
-    if (this.requestFriends.length === 0) this.apiRequestFriends()
-    if (this.resultFriends.length === 0) this.apiResultFriends()
+    // if (this.requestFriends.length === 0)
+      this.apiRequestFriends()
+    // if (this.resultFriends.length === 0)
+      this.apiResultFriends()
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {

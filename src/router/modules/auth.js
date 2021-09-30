@@ -10,6 +10,16 @@ export default [{
     component: () => import('@/pages/Auth/Login.vue')
   },
   {
+    path: '/admin/login',
+    name: 'AdminLogin',
+    meta: {
+      layout: 'form',
+      notRequiresAuth: true,
+      title: 'Админ панель'
+    },
+    component: () => import('@/pages/Admin/Login.vue')
+  },
+  {
     path: '/registration',
     name: 'Registration',
     meta: {

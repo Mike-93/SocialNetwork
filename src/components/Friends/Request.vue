@@ -4,9 +4,12 @@
       li.friends-application__item(v-for="user in requestFriends.request" :key="user.id")
         .friends-application__pic
           img(v-if="user.photo" :src="user.photo" :alt="user.first_name")
-          img(v-else src="/static/img/user/admin.png" :alt="user.first_name")
+          img(v-else src="/static/img/user/2.webp" :alt="user.first_name")
         router-link.friends-application__name(:to="{name: 'ProfileId', params: {id: user.id}}") {{user.first_name + ' ' + user.last_name}}
         a.friends-application__link(href="#" @click.prevent="apiAddFriends(user.id)") Добавить
+        br
+        br
+        a.friends-application__link(href="#" @click.prevent="apiDeclineFriendRequest(user.id)") Отклонить
 </template>
 
 <script>
@@ -20,7 +23,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('profile/friends', ['apiAddFriends'])
+    ...mapActions('profile/friends', ['apiAddFriends', 'apiDeclineFriendRequest'])
   },
   mounted() {
     if (this.requestFriends.length === 0) this.apiRequest()
@@ -90,6 +93,6 @@ export default {
 .friends-application__link {
   font-size: 13px
   color: #21a45d
-  display block
+  display contents
 }
 </style>

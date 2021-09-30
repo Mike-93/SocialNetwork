@@ -6,9 +6,7 @@
       user-info-form-block(label="E-Mail:" v-model="email" )
       user-info-form-block(label="Пароль:" v-model="password" )
       user-info-form-block(label="Повторите пароль:" v-model="passwordTwo" )
-      .user-info-form__block
-        span.user-info-form__label Тип
-        .user-info-form__wrap
+      user-info-form-block(label="Тип:" v-model="type" )
 </template>
 
 <script>

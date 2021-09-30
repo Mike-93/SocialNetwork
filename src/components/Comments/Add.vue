@@ -48,18 +48,17 @@ export default {
 }
 
 .comment-add__pic {
-  width: 36px;
+  width: 43px;
   height: 36px;
   border-radius: 50%;
   overflow: hidden;
   margin-right: 15px;
+  object-fit: cover;
 
   img {
-    width: 100%;
+    width: 36px;
     object-fit: cover;
-    max-width: 100%;
-    height: 100%;
-    width 100%
+    height: 36px;
   }
 }
 

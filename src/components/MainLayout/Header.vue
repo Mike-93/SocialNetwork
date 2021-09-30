@@ -165,6 +165,14 @@ export default {
   color: #fff;
 }
 
+.admin .main-layout__user {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 15px;
+  color: #000;
+}
+
 .main-layout__user-pic {
   width: 50px;
   height: 50px;

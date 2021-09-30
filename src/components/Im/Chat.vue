@@ -2,7 +2,8 @@
   .im-chat
     .im-chat__user
       router-link.im-chat__user-pic(:to="{name: 'ProfileId', params: {id: info.recipient.id}}")
-        img(:src="info.recipient.photo" :alt="info.recipient.first_name")
+        img(v-if="info.recipient.photo" :src="info.recipient.photo" :alt="info.recipient.first_name")
+        img(v-else src="/static/img/user/2.webp" :alt="info.recipient.first_name")
       router-link.im-chat__user-name(:to="{name: 'ProfileId', params: {id: info.recipient.id}}") {{info.recipient.first_name + ' ' + info.recipient.last_name}}
       span.user-status(:class="{online}") {{statusText}}
     .im-chat__infitite_list_wrapper
@@ -146,12 +147,13 @@ export default {
   background-color: #F8FAFD;
 }
 
-.im-chat__user-pic {
+.im-chat__user-pic img {
   width: 40px;
   height: 40px;
   border-radius: 50%;
   overflow: hidden;
   margin-right: 10px;
+  object-fit: cover;
 }
 
 .im-chat__user-name {

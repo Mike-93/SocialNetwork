@@ -4,6 +4,10 @@
     p.form-layout__text {{info.text}}
     p.form-layout__descr(v-if="info.descr") {{info.descr}}
     button-hover.form-layout__btn(:to="{name: info.btn.link}" v-if="info.btn" :variant="info.btn.variant") {{info.btn.text}}
+    br
+    br
+    br
+    button-hover.form-layout__btn(:to="{name: info.btn1.link}" v-if="info.btn1" :variant="info.btn1.variant") {{info.btn1.text}}
 </template>
 
 

@@ -1,4 +1,5 @@
 <template lang="pug">
+.login
   form.admin-login(action="#" @submit.prevent="submitHandler")
     h1.admin-login__title.form__title Вход в админ-панель
     email-field(id="admin-login-email" v-model="email" :v="$v.email")
@@ -12,6 +13,7 @@
 import { required, email, minLength } from 'vuelidate/lib/validators'
 import PasswordField from '@/components/FormElements/PasswordField'
 import EmailField from '@/components/FormElements/EmailField'
+import {mapActions} from "vuex";
 export default {
   name: 'AdminLogin',
   components: {
@@ -23,11 +25,15 @@ export default {
     password: ''
   }),
   methods: {
+    ...mapActions('auth/api', ['login']),
     submitHandler() {
       if (this.$v.$invalid) {
         this.$v.$touch()
         return
       }
+      this.login({email: this.email, password: this.password}).then(() => {
+          this.$router.push({name: 'AdminStatistics'})
+      })
     }
   },
   validations: {
@@ -39,6 +45,13 @@ export default {
 
 <style lang="stylus">
 @import '../../assets/stylus/base/vars.styl';
+
+.login {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 
 .admin-login {
   width: 100%;

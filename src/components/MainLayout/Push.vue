@@ -6,13 +6,14 @@
       .push__list(ref="list")
         .push__item(v-for="info in getNotifications.slice(0, 10)" :key="info.id" @click.stop="")
           .push__img
-            img(:src="info.entity_author.photo" :alt="info.entity_author.first_name")
+           img(v-if="info.entity_author.photo" :src="info.entity_author.photo" :alt="info.entity_author.first_name")
+           img(v-else src="/static/img/user/2.webp" :alt="info.entity_author.first_name")
           p.push__content
             router-link.push__content-name(:to="getRouteByNotification(info)")
               | {{info.entity_author.first_name + ' ' + info.entity_author.last_name}}
               |
-              | {{getNotificationsTextType(info.event_type)}}
-            span.push__content-preview  «{{info.info}}»
+              .push__content-event {{getNotificationsTextType(info.event_type)}}
+            span.push__content-preview(v-if="info.event_type != 'FRIEND_REQUEST'") «{{info.info}}»
           span.push__time {{info.sent_time | moment('from')}}
           button.push__close.push__close_item(@click="closeReadNotificationItem(info.id)" title="скрыть уведомление") X
       router-link.push__btn(:to="{name: 'Push'}" v-if="getNotificationsLength > 1") Показать все ({{getNotificationsLength}})

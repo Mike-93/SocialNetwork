@@ -8,6 +8,10 @@ export default {
         btn: {
           link: 'Registration',
           text: 'Регистрация'
+        },
+        btn1: {
+          link: 'AdminLogin',
+          text: 'Admin Login'
         }
       },
       registration: {

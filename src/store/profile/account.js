@@ -17,7 +17,7 @@ export default {
       },
       {
         icon: 'friends',
-        name: 'О заявках в дузья',
+        name: 'О заявках в друзья',
         type: 'FRIEND_REQUEST',
         enable: false
       },

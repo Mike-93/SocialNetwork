@@ -13,15 +13,15 @@ export default {
         case 'POST':
           return 'опубликовал новую запись'
         case 'POST_COMMENT':
-          return 'оставил комментарий'
+          return 'оставил комментарий:'
         case 'COMMENT_COMMENT':
-          return 'ответил на ваш комментарий'
+          return 'ответил на ваш комментарий:'
         case 'FRIEND_REQUEST':
-          return 'добавил в друзья нового пользователя'
+          return 'добавил вас в друзья'
         case 'FRIEND_BIRTHDAY':
           return 'день рождение'
         case 'MESSAGE':
-          return 'прислал сообщение'
+          return 'прислал сообщение:'
       }
     },
   },
@@ -51,9 +51,9 @@ export default {
           commit('setNotifications', response.data.data)
         // }
         // добавить когда будет прод
-        setTimeout(() => {
-          dispatch('apiNotifications')
-        }, 5000)
+        // setTimeout(() => {
+        //   dispatch('apiNotifications')
+        // }, 5000)
 
       }).catch(() => {})
     },

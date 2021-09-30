@@ -120,6 +120,24 @@ export default {
         console.log(error)
       })
     },
+    apiDeclineFriendRequest({
+      dispatch
+    }, id) {
+      axios({
+        url: `friends/${id}`,
+        method: 'DELETE'
+      }).then(response => {
+        dispatch('global/alert/setAlert', {
+          status: 'success',
+          text: 'Запрос на дружбу отклонён'
+        }, {
+          root: true
+        })
+        dispatch('apiFriends')
+      }).catch(error => {
+        console.log(error)
+      })
+    },
     async apiRequestFriends({
       commit
     }, payload) {

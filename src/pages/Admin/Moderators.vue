@@ -3,7 +3,7 @@
     h2.admin__title Администраторы и модераторы
     .admin__wrap
       .inner-page__main
-        a.admin-moderators__link(href="#") Добавить
+        router-link.admin-moderators__link(href="#" :to="{name: 'AdminEdit'}") Добавить
         friends-block(moderator)
         friends-block(moderator)
       .inner-page__aside
