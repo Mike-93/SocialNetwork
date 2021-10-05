@@ -27,9 +27,8 @@ export default {
   },
   computed: {
     statusText() {
-      return this.online
-        ? 'Онлайн'
-        : 'был в сети ' + moment(this.info.recipient.last_online_time).fromNow()
+      this.online = moment().diff(moment(this.info.recipient.last_online_time), 'seconds') <= 120
+      return this.online ? 'Онлайн' : 'был в сети ' + moment(this.info.recipient.last_online_time).fromNow()
     }
   }
 }

@@ -16,7 +16,7 @@
         span.user-status(:class="{online, offline: !online}") {{statusText}}
       .profile-info__block
         span.profile-info__title Дата рождения:
-        span.profile-info__val(v-if="info.birth_date") {{info.birth_date | moment("D MMMM YYYY") }} ({{info.ages}} года)
+        span.profile-info__val(v-if="info.birth_date") {{info.birth_date | moment("D MMMM YYYY") }} ({{ageToStr(info.ages)}})
         span.profile-info__val(v-else) не заполнено
       .profile-info__block
         span.profile-info__title Телефон:
@@ -33,13 +33,16 @@
     modal(v-model="modalShow")
       p(v-if="modalText") {{modalText}}
       template(slot="actions")
-        button-hover(@click.native.prevent="onConfirm") Да
-        button-hover(variant="red" bordered @click.native="closeModal") Отмена
+        button-hover(v-if="modalType != 'requestReceived'" @click.native.prevent="onConfirm") Да
+        button-hover(v-else @click.native.prevent="onConfirm") Принять
+        button-hover(v-if="modalType != 'requestReceived'" variant="red" bordered @click.native="closeModal") Отмена
+        button-hover(v-else variant="red" bordered @click.native="onDeclineFriendRequest") Отклонить
 </template>
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import Modal from '@/components/Modal'
+import moment from "moment";
 
 export default {
   name: 'ProfileInfo',
@@ -48,7 +51,7 @@ export default {
     me: Boolean,
     online: Boolean,
     blocked: Boolean,
-    friend: Boolean,
+    friend: String,
     info: Object
   },
   data: () => ({
@@ -67,19 +70,24 @@ export default {
     btnVariantInfo() {
       return this.blocked
         ? { variant: 'red', text: 'Разблокировать' }
-        : this.friend
+        : this.friend === 'FRIEND'
         ? { variant: 'red', text: 'Удалить из друзей' }
+        : this.friend === 'REQUEST_RECEIVED'
+        ? { variant: 'white', text: 'Запрос в друзья' }
+        : this.friend === 'REQUEST_SENT'
+        ? { variant: 'white', text: 'Отменить запрос в друзья' }
         : { variant: 'white', text: 'Добавить в друзья' }
     }
   },
   methods: {
     ...mapActions('users/actions', ['apiBlockUser', 'apiUnblockUser']),
-    ...mapActions('profile/friends', ['apiAddFriends', 'apiDeleteFriends']),
+    ...mapActions('profile/friends', ['apiAddFriends', 'apiDeleteFriends', 'apiDeclineFriendRequest',
+      'apiAcceptFriendRequest', 'apiCancelFriendRequest']),
     ...mapActions('profile/dialogs', ['createDialogWithUser', 'apiLoadAllDialogs']),
     ...mapActions('users/info', ['apiInfo']),
     blockedUser() {
       if (this.blocked) return
-      this.modalText = `Вы уверены, что хотите заблокировать пользователя ${this.info.fullName}`
+      this.modalText = `Вы уверены, что хотите заблокировать пользователя ${this.info.fullName}?`
       this.modalShow = true
       this.modalType = 'block'
     },
@@ -90,10 +98,22 @@ export default {
         })
         return
       }
-      if (this.friend) {
+      if (this.friend === 'FRIEND') {
         this.modalText = `Вы уверены, что хотите удалить пользователя ${this.info.fullName} из друзей?`
         this.modalShow = true
         this.modalType = 'deleteFriend'
+        return
+      }
+      if (this.friend === 'REQUEST_RECEIVED') {
+        this.modalText = `Добавить ${this.info.fullName} в друзья?`
+        this.modalShow = true
+        this.modalType = 'requestReceived'
+        return
+      }
+      if (this.friend === 'REQUEST_SENT') {
+        this.apiCancelFriendRequest(this.info.id).then(() => {
+          this.apiInfo(this.$route.params.id)
+        })
         return
       }
       this.apiAddFriends(this.info.id).then(() => {
@@ -111,7 +131,23 @@ export default {
         })
         return
       }
-      this.apiDeleteFriends(this.$route.params.id).then(() => {
+      if (this.modalType === 'deleteFriend') {
+        this.apiDeleteFriends(this.$route.params.id).then(() => {
+          this.apiInfo(this.$route.params.id)
+          this.closeModal()
+        })
+        return
+      }
+      if (this.modalType === 'requestReceived') {
+        this.apiAcceptFriendRequest(this.info.id).then(() => {
+          this.apiInfo(this.$route.params.id)
+          this.closeModal()
+        })
+        return
+      }
+    },
+    onDeclineFriendRequest() {
+      this.apiDeclineFriendRequest(this.$route.params.id).then(() => {
         this.apiInfo(this.$route.params.id)
         this.closeModal()
       })
@@ -119,7 +155,24 @@ export default {
     onSentMessage() {
       if (this.blocked) return false
       this.$router.push({ name: 'Im', query: { userId: this.info.id } })
-    }
+    },
+    ageToStr(age) {
+      var txt;
+      var count = age % 100;
+      if (count >= 5 && count <= 20) {
+        txt = 'лет';
+      } else {
+        count = count % 10;
+        if (count == 1) {
+          txt = 'год';
+        } else if (count >= 2 && count <= 4) {
+          txt = 'года';
+        } else {
+          txt = 'лет';
+        }
+      }
+      return age+" "+txt;
+    },
   }
 }
 </script>

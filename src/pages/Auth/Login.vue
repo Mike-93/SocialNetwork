@@ -40,7 +40,7 @@ export default {
       }
       this.login({email: this.email, password: this.password}).then(() => {
         this.apiInfo().then(() => {
-          this.$router.push({name: this.redirectUrl || 'News'})
+          this.$router.push({name: 'News'})
         })
       })
     }

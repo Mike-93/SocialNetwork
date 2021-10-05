@@ -10,16 +10,12 @@
       label.search__label Возраст:
       .search__row
         select.select.search-filter__select(v-model.number="age_from")
-          option(value="null" disabled) От
-          option(value="31") От 31
-          option(value="32") От 32 
-          option(value="33") От 33 
+          option(value="" enabled) От
+          option(v-for="from in fromYears" :value="from") От {{from}}
         span.search__age-defis —
         select.select.search-filter__select(v-model.number="age_to")
-          option(value="null" disabled) До
-          option(value="34") До 34
-          option(value="35") До 35
-          option(value="36") До 36
+          option(value="" enabled) До
+          option(v-for="to in toYears" :value="to") До {{to}}
     .search-filter__block.region
       label.search__label Регион:
       .search__row
@@ -51,6 +47,34 @@ export default {
     offset: 0,
     itemPerPage: 20
   }),
+  computed: {
+    fromYears() {
+      var foo = [];
+      var to;
+      if (this.age_to === null || this.age_to === "") {
+        to = 70;
+      } else {
+        to = this.age_to;
+      }
+      for (var i = 18; i <= to; i++) {
+          foo.push(i);
+        }
+        return foo;
+    },
+    toYears() {
+      var foo = [];
+      var from;
+      if (this.age_from === null || this.age_from === "") {
+        from = 18;
+      } else {
+        from = this.age_from;
+      }
+        for (var i = from; i <= 70; i++) {
+          foo.push(i);
+        }
+        return foo;
+      }
+  },
   methods: {
     ...mapActions('global/search', ['searchUsers']),
     onSearchUsers() {

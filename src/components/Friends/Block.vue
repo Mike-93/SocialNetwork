@@ -6,7 +6,7 @@
     .friends-block__info
       router-link.friends-block__name(:to="{name: 'ProfileId', params: {id: info.id}}") {{info.first_name}} {{info.last_name}}
       span.friends-block__age-city(v-if="info.moderator") модератор
-      span.friends-block__age-city(v-else-if="info.birth_date && info.city") {{info.birth_date | moment('from', true)}}, {{info.city}}
+      span.friends-block__age-city(v-else-if="info.birth_date && info.city") {{agetostr(info)}}, {{info.city}}
       span.friends-block__age-city(v-else) профиль не заполнен
     .friends-block__actions
       template(v-if="info.moderator")
@@ -24,7 +24,7 @@
           simple-svg(:filepath="'/static/img/sidebar/im.svg'")
         .friends-block__actions-block.delete(v-tooltip.bottom="'Удалить из друзей'" @click="openModal('delete')" v-if="friends === info.id")
           simple-svg(:filepath="'/static/img/delete.svg'")
-        .friends-block__actions-block.add(v-tooltip.bottom="'отправить запрос в друзья'" @click="apiAddFriends(info.id)" v-else)
+        .friends-block__actions-block.add(v-tooltip.bottom="'Отправить запрос в друзья'" @click="apiAddFriends(info.id)" v-else)
           simple-svg(:filepath="'/static/img/friend-add.svg'")
         .friends-block__actions-block(v-tooltip.bottom="'Заблокировать'" @click="openModal('blocked')")
           simple-svg(:filepath="'/static/img/friend-blocked.svg'")
@@ -38,9 +38,12 @@
 <script>
 import Modal from '@/components/Modal'
 import { mapActions, mapGetters } from 'vuex'
+import moment from "moment";
 export default {
   name: 'FriendsBlock',
-  props: ['info'],
+  props: {
+    info: Object
+  },
   components: { Modal },
   data: () => ({
     modalShow: false,
@@ -92,6 +95,24 @@ export default {
         : this.modalType === 'deleteModerator'
         ? console.log('delete moderator')
         : this.apiBlockUser(id).then(() => this.closeModal())
+    },
+    agetostr(info) {
+      var age = moment().diff(info.birth_date, 'years');
+      var txt;
+      var count = age % 100;
+      if (count >= 5 && count <= 20) {
+        txt = 'лет';
+      } else {
+        count = count % 10;
+        if (count == 1) {
+          txt = 'год';
+        } else if (count >= 2 && count <= 4) {
+          txt = 'года';
+        } else {
+          txt = 'лет';
+        }
+      }
+      return age+" "+txt;
     },
     ...mapActions('profile/friends', ['apiResultFriends'])
   },

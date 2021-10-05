@@ -4,6 +4,7 @@
       .profile__info
         profile-info(
           :info="getUsersInfo"
+          :me="getUsersInfo.me"
           :blocked="getUsersInfo.is_blocked"
           :friend="getUsersInfo.is_friend"
           :online="getUsersInfo.is_onlined")

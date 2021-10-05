@@ -48,7 +48,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('profile/friends', ['apiRequestFriends', 'apiResultFriends'])
+    ...mapActions('profile/friends', ['apiRequestFriends', 'apiResultFriends', 'apiFriends'])
   },
   mounted() {
     // if (this.requestFriends.length === 0)

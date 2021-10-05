@@ -20,7 +20,7 @@ export default {
       // библиотека - petrovich
       result.fullName = result.first_name + ' ' + result.last_name
       result.ages = moment().diff(result.birth_date, 'years')
-      result.is_onlined = moment().diff(moment(result.last_online_time), 'seconds') <= 60
+      result.is_onlined = moment().diff(moment(result.last_online_time), 'seconds') <= 120
       return result
     },
     getUsersInfo(state) {
@@ -32,7 +32,7 @@ export default {
       // библиотека - petrovich
       result.fullName = result.first_name + ' ' + result.last_name
       result.ages = moment().diff(result.birth_date, 'years')
-      result.is_onlined = moment().diff(moment(result.last_online_time), 'seconds') <= 60
+      result.is_onlined = moment().diff(moment(result.last_online_time), 'seconds') <= 120
       return result
     },
     getWall: s => s.wall,
@@ -105,6 +105,14 @@ export default {
         await dispatch('apiWall', {id})
         commit('setUsersInfo', response.data.data)
       }).catch(error => {})
-    }
+    },
+    async checkOnline({
+      commit, dispatch
+    }) {
+      await axios({
+        url: 'users/checkonline',
+        method: 'PUT'
+      }).then(response => {}).catch(() => {})
+    },
   }
 }

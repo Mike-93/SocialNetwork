@@ -111,7 +111,25 @@ export default {
       }).then(response => {
         dispatch('global/alert/setAlert', {
           status: 'success',
-          text: 'Друг добавлен'
+          text: 'Запрос на дружбу отправлен'
+        }, {
+          root: true
+        })
+        dispatch('apiFriends')
+      }).catch(error => {
+        console.log(error)
+      })
+    },
+    apiAcceptFriendRequest({
+      dispatch
+    }, id) {
+      axios({
+        url: `friends/${id}`,
+        method: 'POST'
+      }).then(response => {
+        dispatch('global/alert/setAlert', {
+          status: 'success',
+          text: 'Вы приняли запрос на дружбу'
         }, {
           root: true
         })
@@ -130,6 +148,24 @@ export default {
         dispatch('global/alert/setAlert', {
           status: 'success',
           text: 'Запрос на дружбу отклонён'
+        }, {
+          root: true
+        })
+        dispatch('apiFriends')
+      }).catch(error => {
+        console.log(error)
+      })
+    },
+    apiCancelFriendRequest({
+      dispatch
+    }, id) {
+      axios({
+        url: `friends/${id}`,
+        method: 'DELETE'
+      }).then(response => {
+        dispatch('global/alert/setAlert', {
+          status: 'success',
+          text: 'Запрос на дружбу отменён'
         }, {
           root: true
         })

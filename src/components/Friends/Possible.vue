@@ -27,7 +27,8 @@ export default {
     ...mapActions('profile/friends', ['apiAddFriends', 'apiRecommendations'])
   },
   mounted() {
-    if (this.possibleFriends.length === 0) this.apiRecommendations()
+    // if (this.possibleFriends.length === 0) this.apiRecommendations()
+    this.apiRecommendations()
   }
 }
 </script>
