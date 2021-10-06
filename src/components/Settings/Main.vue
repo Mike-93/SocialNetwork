@@ -75,7 +75,7 @@ export default {
       return this.phone.replace(/\D+/g, '')
     },
     years() {
-      return Array.from({ length: 60 }, (value, index) => 1970 + index)
+      return Array.from({ length: 35 }, (value, index) => 1970 + index)
     },
     days() {
       return this.month.val === 2
@@ -132,7 +132,7 @@ export default {
       this.name = this.getInfo.first_name
       this.lastName = this.getInfo.last_name
       this.src = this.getInfo.photo
-      this.phone = this.getInfo.phone ? this.getInfo.phone.replace(/^[+]?[78]/, "") : "";
+      this.phone = this.getInfo.phone ? this.getInfo.phone.replace(/^[+]?7/, "") : "";
       if (this.getInfo.birth_date) {
         this.day = moment(this.getInfo.birth_date).date()
         this.month = this.months[moment(this.getInfo.birth_date).month()]

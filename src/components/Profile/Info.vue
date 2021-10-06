@@ -4,7 +4,12 @@
       .profile-info__img(:class="{offline: !online && !me}")
         img(v-if="info.photo" :src="info.photo" :alt="info.fullName")
         img(v-else src="/static/img/user/2.webp" :alt="info.fullName")
-      .profile-info__actions(v-if="!me")
+      .profile-info__actions(v-if="!me && meBlocked && !blocked")
+        button-hover(disable) Вы заблокированы
+      .profile-info__actions(v-else-if="!me && meBlocked && blocked")
+        button-hover(:disable="blocked" @click.native="onSentMessage") Вы заблокированы
+        button-hover.profile-info__add(:variant="btnVariantInfo.variant" bordered  @click.native="profileAction") {{btnVariantInfo.text}}
+      .profile-info__actions(v-else-if="!me")
         button-hover(:disable="blocked" @click.native="onSentMessage") Написать сообщение
         button-hover.profile-info__add(:variant="btnVariantInfo.variant" bordered  @click.native="profileAction") {{btnVariantInfo.text}}
     .profile-info__main
@@ -52,6 +57,7 @@ export default {
     online: Boolean,
     blocked: Boolean,
     friend: String,
+    meBlocked: Boolean,
     info: Object
   },
   data: () => ({
