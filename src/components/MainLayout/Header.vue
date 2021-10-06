@@ -131,6 +131,10 @@ export default {
   justify-content: center;
   cursor: pointer;
 
+  &:hover path {
+    fill: #000;
+  }
+
   .simple-svg-wrapper {
     width: 17px;
     height: 17px;

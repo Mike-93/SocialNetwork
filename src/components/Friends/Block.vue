@@ -26,7 +26,9 @@
           simple-svg(:filepath="'/static/img/delete.svg'")
         .friends-block__actions-block.add(v-tooltip.bottom="'Отправить запрос в друзья'" @click="apiAddFriends(info.id)" v-else)
           simple-svg(:filepath="'/static/img/friend-add.svg'")
-        .friends-block__actions-block(v-tooltip.bottom="'Заблокировать'" @click="openModal('blocked')")
+        .friends-block__actions-block(v-if="!info.is_blocked" v-tooltip.bottom="'Заблокировать'" @click="openModal('blocked')")
+          simple-svg(:filepath="'/static/img/friend-blocked.svg'")
+        .friends-block__actions-block.unblock(v-else v-tooltip.bottom="'Разблокировать'" @click="openModal('unblocked')")
           simple-svg(:filepath="'/static/img/friend-blocked.svg'")
     modal(v-model="modalShow")
       p(v-if="modalText") {{modalText}}
@@ -210,6 +212,18 @@ export default {
 
     .simple-svg {
       fill: eucalypt;
+    }
+  }
+
+  &.unblock {
+
+    .simple-svg path {
+      fill: red;
+      stroke: red;
+    }
+
+    .simple-svg line {
+      stroke: red;
     }
   }
 
