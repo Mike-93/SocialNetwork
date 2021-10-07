@@ -36,6 +36,7 @@ Vue.component('button-hover', {
   computed: {
     classObject() {
       return {
+        'btn--blue': this.variant === 'blue',
         'btn--white': this.variant === 'white',
         'btn--dark': this.variant === 'dark',
         'btn--red': this.variant === 'red',

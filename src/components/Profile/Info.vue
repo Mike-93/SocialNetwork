@@ -79,7 +79,7 @@ export default {
         : this.friend === 'FRIEND'
         ? { variant: 'red', text: 'Удалить из друзей' }
         : this.friend === 'REQUEST_RECEIVED'
-        ? { variant: 'white', text: 'Запрос в друзья' }
+        ? { variant: 'blue', text: 'Запрос в друзья' }
         : this.friend === 'REQUEST_SENT'
         ? { variant: 'white', text: 'Отменить запрос в друзья' }
         : { variant: 'white', text: 'Добавить в друзья' }

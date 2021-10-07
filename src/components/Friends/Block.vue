@@ -20,11 +20,19 @@
         .friends-block__actions-block(v-tooltip.bottom="'Заблокировать'" v-else)
           simple-svg(:filepath="'/static/img/blocked.svg'")
       template(v-else)
-        .friends-block__actions-block.message(v-tooltip.bottom="'Написать сообщение'" @click="sendMessage(info.id)")
+        .friends-block__actions-block.message(v-if="!info.is_blocked && !info.is_you_blocked" v-tooltip.bottom="'Написать сообщение'" @click="sendMessage(info.id)")
           simple-svg(:filepath="'/static/img/sidebar/im.svg'")
-        .friends-block__actions-block.delete(v-tooltip.bottom="'Удалить из друзей'" @click="openModal('delete')" v-if="friends === info.id")
+        .friends-block__actions-block.message-blocked(v-else-if="!info.is_blocked && info.is_you_blocked" v-tooltip.bottom="'Вы заблокированы'")
+          simple-svg(:filepath="'/static/img/sidebar/im.svg'")
+        .friends-block__actions-block.delete(v-tooltip.bottom="'Удалить из друзей'" @click="openModal('delete')" v-if="info.is_friend === 'FRIEND' && !info.is_blocked")
           simple-svg(:filepath="'/static/img/delete.svg'")
-        .friends-block__actions-block.add(v-tooltip.bottom="'Отправить запрос в друзья'" @click="apiAddFriends(info.id)" v-else)
+        .friends-block__actions-block.request-received(v-tooltip.bottom="'Запрос в друзья'" @click="openModal('requestReceived')" v-else-if="info.is_friend === 'REQUEST_RECEIVED'")
+          simple-svg(:filepath="'/static/img/friend-request.svg'")
+        .friends-block__actions-block.cancel-request(v-tooltip.bottom="'Отменить запрос в друзья'" @click="apiCancelFriendRequest(info.id)" v-else-if="info.is_friend === 'REQUEST_SENT'")
+          simple-svg(:filepath="'/static/img/friend-request.svg'")
+        .friends-block__actions-block.add(v-tooltip.bottom="'Отправить запрос в друзья'" @click="apiAddFriends(info.id)" v-else-if="!info.is_blocked && !info.is_you_blocked")
+          simple-svg(:filepath="'/static/img/friend-add.svg'")
+        .friends-block__actions-block.add-blocked(v-tooltip.bottom="'Вы заблокированы'" v-else-if="!info.is_blocked && info.is_you_blocked")
           simple-svg(:filepath="'/static/img/friend-add.svg'")
         .friends-block__actions-block(v-if="!info.is_blocked" v-tooltip.bottom="'Заблокировать'" @click="openModal('blocked')")
           simple-svg(:filepath="'/static/img/friend-blocked.svg'")
@@ -33,8 +41,10 @@
     modal(v-model="modalShow")
       p(v-if="modalText") {{modalText}}
       template(slot="actions")
-        button-hover(@click.native="onConfrim(info.id)") Да
-        button-hover(variant="red" bordered @click.native="closeModal") Отмена
+        button-hover(v-if="modalType != 'requestReceived'" @click.native="onConfirm(info.id)") Да
+        button-hover(v-else @click.native="onConfirm(info.id)") Принять
+        button-hover(v-if="modalType != 'requestReceived'" variant="red" bordered @click.native="closeModal") Отмена
+        button-hover(v-else variant="red" bordered @click.native="onDeclineFriendRequest(info.id)") Отклонить
 </template>
 
 <script>
@@ -74,11 +84,16 @@ export default {
         ? `Вы уверены, что хотите удалить пользователя ${this.info.first_name + ' ' + this.info.last_name} из друзей?`
         : this.modalType === 'deleteModerator'
         ? `Вы уверены, что хотите удалить ${this.info.first_name + ' ' + this.info.last_name} из списка модераторов?`
+        : this.modalType === 'unblocked'
+        ? `Вы уверены, что хотите разблокировать пользователя ${this.info.first_name + ' ' + this.info.last_name}?`
+        : this.modalType === 'requestReceived'
+        ? `Добавить ${this.info.first_name + ' ' + this.info.last_name} в друзья?`
         : `Вы уверены, что хотите заблокировать пользователя ${this.info.first_name + ' ' + this.info.last_name}?`
     },
   },
   methods: {
-    ...mapActions('profile/friends', ['apiAddFriends', 'apiDeleteFriends', 'apiFriends']),
+    ...mapActions('profile/friends', ['apiAddFriends', 'apiDeleteFriends', 'apiFriends', 'apiAcceptFriendRequest',
+      'apiCancelFriendRequest', 'apiDeclineFriendRequest']),
     ...mapActions('profile/dialogs', ['openDialog']),
     ...mapActions('users/actions', ['apiBlockUser', 'apiUnblockUser']),
     closeModal() {
@@ -91,11 +106,15 @@ export default {
     sendMessage(userId) {
       this.$router.push({ name: 'Im', query: { userId: userId } })
     },
-    onConfrim(id) {
+    onConfirm(id) {
       this.modalType === 'delete'
         ? this.apiDeleteFriends(id).then(() => this.closeModal())
         : this.modalType === 'deleteModerator'
         ? console.log('delete moderator')
+        : this.modalType === 'unblocked'
+        ? this.apiUnblockUser(id).then(() => this.closeModal())
+        : this.modalType === 'requestReceived'
+        ? this.apiAcceptFriendRequest(id).then(() => this.closeModal())
         : this.apiBlockUser(id).then(() => this.closeModal())
     },
     agetostr(info) {
@@ -115,6 +134,9 @@ export default {
         }
       }
       return age+" "+txt;
+    },
+    onDeclineFriendRequest(id) {
+      this.apiDeclineFriendRequest(id).then(() => this.closeModal())
     },
     ...mapActions('profile/friends', ['apiResultFriends'])
   },
@@ -215,6 +237,23 @@ export default {
     }
   }
 
+  &.message-blocked {
+    margin-top: 5px;
+
+    .simple-svg {
+      fill: red;
+      cursor: not-allowed;
+    }
+  }
+
+  &.cancel-request {
+
+    .simple-svg path {
+      fill: red;
+      stroke: red;
+    }
+  }
+
   &.unblock {
 
     .simple-svg path {
@@ -234,6 +273,20 @@ export default {
   &.add {
     margin-top: 2px;
     margin-left: 15px;
+    align-items: center;
+  }
+
+  &.add-blocked {
+    margin-top: 2px;
+    margin-left: 15px;
+    align-items: center;
+    cursor: not-allowed;
+
+    .simple-svg path {
+      fill: red;
+      stroke: red;
+
+    }
   }
 
   .simple-svg-wrapper {
