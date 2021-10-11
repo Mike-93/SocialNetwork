@@ -26,7 +26,7 @@ export default {
       }).then(async response => {
         dispatch('global/alert/setAlert', {
           status: 'success',
-          text: 'Зарегестрирован, делаю логин'
+          text: 'Вы успешно зарегестрированы'
         }, {
           root: true
         })

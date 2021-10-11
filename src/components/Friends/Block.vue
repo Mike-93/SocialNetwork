@@ -6,6 +6,8 @@
     .friends-block__info
       router-link.friends-block__name(:to="{name: 'ProfileId', params: {id: info.id}}") {{info.first_name}} {{info.last_name}}
       span.friends-block__age-city(v-if="info.moderator") модератор
+      span.friends-block__age-city(v-else-if="info.birth_date && !info.city") {{agetostr(info)}}, город не указан
+      span.friends-block__age-city(v-else-if="!info.birth_date && info.city") возраст не указан, {{info.city}}
       span.friends-block__age-city(v-else-if="info.birth_date && info.city") {{agetostr(info)}}, {{info.city}}
       span.friends-block__age-city(v-else) профиль не заполнен
     .friends-block__actions
@@ -37,7 +39,7 @@
         .friends-block__actions-block(v-if="!info.is_blocked" v-tooltip.bottom="'Заблокировать'" @click="openModal('blocked')")
           simple-svg(:filepath="'/static/img/friend-blocked.svg'")
         .friends-block__actions-block.unblock(v-else v-tooltip.bottom="'Разблокировать'" @click="openModal('unblocked')")
-          simple-svg(:filepath="'/static/img/friend-blocked.svg'")
+          simple-svg(:filepath="'/static/img/friend-unblock.svg'")
     modal(v-model="modalShow")
       p(v-if="modalText") {{modalText}}
       template(slot="actions")
@@ -241,7 +243,7 @@ export default {
     margin-top: 5px;
 
     .simple-svg {
-      fill: red;
+      fill: #FF5573;
       cursor: not-allowed;
     }
   }
@@ -249,20 +251,17 @@ export default {
   &.cancel-request {
 
     .simple-svg path {
-      fill: red;
-      stroke: red;
+      fill: #FF5573;
+      stroke: #FF5573;
     }
   }
 
   &.unblock {
 
     .simple-svg path {
-      fill: red;
-      stroke: red;
-    }
-
-    .simple-svg line {
-      stroke: red;
+      fill: #FF5573;
+      stroke-width: 0.1;
+      stroke: #FF5573;
     }
   }
 
@@ -283,8 +282,8 @@ export default {
     cursor: not-allowed;
 
     .simple-svg path {
-      fill: red;
-      stroke: red;
+      fill: #FF5573;
+      stroke: #FF5573;
 
     }
   }

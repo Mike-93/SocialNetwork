@@ -6,7 +6,7 @@
           img(v-if="user.photo" :src="user.photo" :alt="user.first_name")
           img(v-else src="/static/img/user/2.webp" :alt="user.first_name")
         router-link.friends-application__name(:to="{name: 'ProfileId', params: {id: user.id}}") {{user.first_name + ' ' + user.last_name}}
-        a.friends-application__link(href="#" @click.prevent="apiAddFriends(user.id)") Добавить
+        a.friends-application__link(href="#" @click.prevent="apiAcceptFriendRequest(user.id)") Добавить
         br
         br
         a.friends-application__link(href="#" @click.prevent="apiDeclineFriendRequest(user.id)") Отклонить
@@ -23,7 +23,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('profile/friends', ['apiAddFriends', 'apiDeclineFriendRequest'])
+    ...mapActions('profile/friends', ['apiAcceptFriendRequest', 'apiDeclineFriendRequest'])
   },
   mounted() {
     if (this.requestFriends.length === 0) this.apiRequest()

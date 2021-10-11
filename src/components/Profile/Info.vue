@@ -13,7 +13,7 @@
         button-hover(:disable="blocked" @click.native="onSentMessage") Написать сообщение
         button-hover.profile-info__add(:variant="btnVariantInfo.variant" bordered  @click.native="profileAction") {{btnVariantInfo.text}}
     .profile-info__main
-      router-link.edit(v-if="me" :to="{name: 'Settings'}")
+      router-link.edit(v-if="me" :to="{name: 'Settings'}" v-tooltip.bottom="'Редактировать профиль'")
         simple-svg(:filepath="'/static/img/edit.svg'")
       span.profile-info__blocked(:class="{blocked}" v-else @click="blockedUser") {{blockedText}}
       .profile-info__header

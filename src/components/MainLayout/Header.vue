@@ -133,6 +133,7 @@ export default {
 
   &:hover path {
     fill: #000;
+    transition: fill 0.5s ease-in;
   }
 
   .simple-svg-wrapper {

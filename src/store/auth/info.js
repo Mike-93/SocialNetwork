@@ -11,7 +11,7 @@ export default {
         },
         btn1: {
           link: 'AdminLogin',
-          text: 'Admin Login'
+          text: 'Вход в админ-панель'
         }
       },
       registration: {

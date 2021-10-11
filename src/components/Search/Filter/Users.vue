@@ -20,21 +20,17 @@
       label.search__label Регион:
       .search__row
         select.select.search-filter__select(v-model="country")
-          option(value="null" disabled) Страна
-          option Россия
-          option Англия
-          option США
+          option(value="" enabled) Страна
+          option(v-for="country in countries" :value="country.title") {{country.title}}
         select.select.search-filter__select(v-model="city")
-          option(value="null" disabled) Город
-          option Москва
-          option Лондон
-          option Техас
+          option(value="" enabled) Город
+          option(v-for="city in cities" :value="city.title") {{city.title}}
     .search-filter__block.btn-news(@click.prevent="onSearchUsers")
       button-hover Применить
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import {mapActions, mapGetters} from 'vuex'
 export default {
   name: 'SearchFilterUsers',
   data: () => ({
@@ -48,6 +44,14 @@ export default {
     itemPerPage: 20
   }),
   computed: {
+    ...mapGetters('platform/cities', ['getCities']),
+    cities() {
+      return this.getCities;
+    },
+    ...mapGetters('platform/countries', ['getCountries']),
+    countries() {
+      return this.getCountries;
+    },
     fromYears() {
       var foo = [];
       var to;
@@ -77,10 +81,16 @@ export default {
   },
   methods: {
     ...mapActions('global/search', ['searchUsers']),
+    ...mapActions('platform/cities', ['apiCities']),
+    ...mapActions('platform/countries', ['apiCountries']),
     onSearchUsers() {
       let { first_name, last_name, age_from, age_to, country, city } = this
       this.searchUsers({ first_name, last_name, age_from, age_to, country, city })
     }
+  },
+  mounted() {
+    this.apiCities()
+    this.apiCountries()
   }
 }
 </script>

@@ -5,41 +5,30 @@
       .friends-search__row
         .friends-search__block
           label.search__label(for="friends-search-name") Имя:
-          input.search__input(type="text" id="friends-search-name" v-model.trim="$v.first_name.$model")
-        .error(v-if="!$v.first_name.minLength") минимум {{$v.first_name.$params.minLength.min}} символа.
+          input.search__input(type="text" id="friends-search-name" v-model="first_name")
         .friends-search__block
           label.search__label(for="friends-search-lastname") Фамилия:
-          input.search__input(type="text" id="friends-search-lastname" v-model.trim="$v.last_name.$model")
-        .error(v-if="!$v.last_name.minLength") минимум {{$v.last_name.$params.minLength.min}} символа.
+          input.search__input(type="text" id="friends-search-lastname" v-model="last_name")
       .friends-search__block
         label.search__label Возраст:
         .search__row
           select.select.friends-search__select(v-model.number="age_from")
-            option(value="null" disabled) От
-            option(value="18") От 18
-            option(value="30") От 30
-            option(value="") Все
+            option(value="" enabled) От
+            option(v-for="from in fromYears" :value="from") От {{from}}
           span.search__age-defis —
           select.select.friends-search__select(v-model.number="age_to")
-            option(value="null" disabled) До
-            option(value="45") До 50
-            option(value="") Все
+            option(value="" enabled) До
+            option(v-for="to in toYears" :value="to") До {{to}}
       .friends-search__block
         label.search__label Регион:
         .search__row
-          select.select.friends-search__select(v-model="country_id")
-            option(value="null" disabled) Страна
-            option(v-for="country in this.getCountries" :value="country.id" :key="country.id") {{ country.title }}
-            option(value="") Все
-
-          select.select.friends-search__select(v-model="city_id")
-            option(value="null" disabled) Город
-            option(v-for="city in this.getCities" :value="city.id" :key="city.id") {{ city.title }}
-            option(value="") Все
-    button.friends-possible__btn(
-      type="submit"
-      :disabled="!$v.last_name.required || !$v.first_name.required || !$v.last_name.minLength || !$v.first_name.minLength"
-      )
+          select.select.friends-search__select(v-model="country")
+            option(value="" enabled) Страна
+            option(v-for="country in countries" :value="country.title") {{country.title}}
+          select.select.friends-search__select(v-model="city")
+            option(value="" enabled) Город
+            option(v-for="city in cities" :value="city.title") {{city.title}}
+    button.friends-possible__btn(type="submit")
       simple-svg(:filepath="'/static/img/search.svg'")
       span.friends-possible__link Искать друзей
 </template>
@@ -57,42 +46,63 @@ export default {
     last_name: '',
     age_from: null,
     age_to: null,
-    country_id: null,
-    city_id: null,
+    country: null,
+    city: null,
     offset: 0,
-    itemPerPage: 20,
-    submitStatus: null
+    itemPerPage: 20
   }),
   computed: {
+    ...mapGetters('platform/cities', ['getCities']),
+    cities() {
+      return this.getCities;
+    },
     ...mapGetters('platform/countries', ['getCountries']),
-    ...mapGetters('platform/cities', ['getCities', 'getDefaultCities']),
+    countries() {
+      return this.getCountries;
+    },
+    fromYears() {
+      var foo = [];
+      var to;
+      if (this.age_to === null || this.age_to === "") {
+        to = 70;
+      } else {
+        to = this.age_to;
+      }
+      for (var i = 18; i <= to; i++) {
+        foo.push(i);
+      }
+      return foo;
+    },
+    toYears() {
+      var foo = [];
+      var from;
+      if (this.age_from === null || this.age_from === "") {
+        from = 18;
+      } else {
+        from = this.age_from;
+      }
+      for (var i = from; i <= 70; i++) {
+        foo.push(i);
+      }
+      return foo;
+    }
   },
   methods: {
     ...mapActions('global/search', ['searchUsers', 'clearSearch']),
     ...mapActions('platform/countries', ['apiCountries']),
     ...mapMutations('platform/cities', ['setDefaultCities']),
-    // ...mapActions('platform/cities', ['apiCities']),
+    ...mapActions('platform/cities', ['apiCities']),
     onSearchUsers() {
-      if (this.$v.$invalid) {
-        this.$v.$touch()
-        this.submitStatus = 'ERROR'
-        return
-      }
-      this.submitStatus = 'OK'
-      let { first_name, last_name, age_from, age_to, country_id, city_id } = this;
-      this.searchUsers({ first_name, last_name, age_from, age_to, country_id, city_id })
+      let { first_name, last_name, age_from, age_to, country, city } = this;
+      this.searchUsers({ first_name, last_name, age_from, age_to, country, city })
     },
   },
-  validations: {
-    first_name: { required, minLength: minLength(3) },
-    last_name: { required, minLength: minLength(3) }
-  },
-  beforeDestroy() {
-    this.clearSearch()
-  },
+  // beforeDestroy() {
+  //   this.clearSearch()
+  // },
   created() {
-    this.apiCountries();
-    // this.apiCities();
+    this.apiCountries()
+    this.apiCities()
   }
 }
 </script>
