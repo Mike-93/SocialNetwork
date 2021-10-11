@@ -21,7 +21,7 @@
           simple-svg(:filepath="'/static/img/unblocked.svg'")
         .friends-block__actions-block(v-tooltip.bottom="'Заблокировать'" v-else)
           simple-svg(:filepath="'/static/img/blocked.svg'")
-      template(v-else)
+      template(v-else-if="!info.me")
         .friends-block__actions-block.message(v-if="!info.is_blocked && !info.is_you_blocked" v-tooltip.bottom="'Написать сообщение'" @click="sendMessage(info.id)")
           simple-svg(:filepath="'/static/img/sidebar/im.svg'")
         .friends-block__actions-block.message-blocked(v-else-if="!info.is_blocked && info.is_you_blocked" v-tooltip.bottom="'Вы заблокированы'")
