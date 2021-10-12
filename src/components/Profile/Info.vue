@@ -28,8 +28,12 @@
         a.profile-info__val(v-if="info.phone" :href="`tel:${info.phone}`") {{info.phone | phone}}
         a.profile-info__val(v-else) не заполнено
       .profile-info__block
-        span.profile-info__title Страна, город:
-        span.profile-info__val(v-if="info.country") {{info.country}}, {{info.city}}
+        span.profile-info__title Страна:
+        span.profile-info__val(v-if="info.country") {{info.country}}
+        span.profile-info__val(v-else) не заполнено
+      .profile-info__block
+        span.profile-info__title Город:
+        span.profile-info__val(v-if="info.country") {{info.city}}
         span.profile-info__val(v-else) не заполнено
       .profile-info__block
         span.profile-info__title О себе:
@@ -302,6 +306,7 @@ export default {
   width: 100%;
   max-width: 200px;
   flex: none;
+  line-height: 25px;
   color: #47474C;
 
   @media (max-width: breakpoint-xxl) {
