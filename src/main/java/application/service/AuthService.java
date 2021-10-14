@@ -11,7 +11,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,7 +30,9 @@ public class AuthService {
             String email = request.getEmail();
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, request.getPassword()));
             String token = jwtTokenProvider.createToken(email);
-            return getAuth(request, token);
+            PersonDto personDto = getAuth(request, token);
+            daoPerson.setLastOnlineTime(personDto.getId());
+            return personDto;
         } catch (AuthenticationException ex) {
             throw new BadCredentialsException("Invalid username or password");
         }
@@ -39,7 +40,6 @@ public class AuthService {
 
     public MessageResponseDto getLogout() {
 
-        SecurityContextHolder.getContext().setAuthentication(null);
         return new MessageResponseDto();
     }
 

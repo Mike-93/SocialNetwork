@@ -12,6 +12,7 @@ import lombok.val;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,7 +27,11 @@ public class FriendsService {
     public List<PersonDto> getUserFriends() {
 
         return daoPerson.getFriends(daoPerson.getAuthPerson().getId()).stream()
-                .map(PersonDto::fromPerson).collect(Collectors.toList());
+                .map(person -> {
+                    PersonDto personDto = PersonDto.fromPerson(person);
+                    personDto.setFriendStatus(FriendshipStatus.FRIEND.toString());
+                    return personDto;
+                }).collect(Collectors.toList());
     }
 
     public List<PersonDto> getUserFriendsRequest() {
@@ -36,23 +41,37 @@ public class FriendsService {
     }
 
     public List<PersonDto> getUserFriendsRecommendations() {
+
         Person currentPerson = daoPerson.getAuthPerson();
-
-        List<Integer> listBlockPerson;
+        List<Integer> listBlockPerson = new ArrayList<>();
         val personList = daoPerson.getRecommendations(currentPerson.getId());
-
         try {
-            listBlockPerson = daoPerson.getBlockId(currentPerson.getId());
+            listBlockPerson.addAll(daoPerson.getBlockedIds(currentPerson.getId()));
+            listBlockPerson.addAll(daoPerson.getYouBlockId(currentPerson.getId()));
+            listBlockPerson.addAll(daoPerson.getFriends(currentPerson.getId()).stream().map(Person::getId)
+                    .collect(Collectors.toList()));
+            listBlockPerson.addAll(daoPerson.getFriendsRequest(currentPerson.getId()).stream().map(Person::getId)
+                    .collect(Collectors.toList()));
+            listBlockPerson.addAll(daoPerson.getYourRequestId(currentPerson.getId()));
         } catch (EmptyResultDataAccessException e) {
             listBlockPerson = Collections.emptyList();
         }
-
         List<Integer> finalListBlockPerson = listBlockPerson;
+        if (personList.size() > 0 && personList.size() < 20) {
+            val recommendOnRegDate = daoPerson.getRecommendationsOnRegDate(currentPerson.getId());
+            int size = recommendOnRegDate.size() > 20 ? 20 - personList.size() : recommendOnRegDate.size();
+            for (int i = 0; i < size; i++) {
+                personList.add(recommendOnRegDate.get(i));
+            }
+            return personList.stream().filter(person -> !finalListBlockPerson.contains(person.getId()))
+                    .collect(Collectors.toSet()).stream()
+                    .map(PersonDto::fromPerson).collect(Collectors.toList());
+        }
         return personList.size() == 0 ? daoPerson.getRecommendationsOnRegDate(currentPerson.getId()).stream()
                 .filter(person -> !finalListBlockPerson.contains(person.getId()))
-                .map(PersonDto::fromPerson).collect(Collectors.toList()) :
-                personList.stream().filter(person -> !finalListBlockPerson.contains(person.getId())).map(PersonDto::fromPerson)
-                        .collect(Collectors.toList());
+                .map(PersonDto::fromPerson).collect(Collectors.toList()) : personList.stream().filter(person ->
+                        !finalListBlockPerson.contains(person.getId()))
+                .map(PersonDto::fromPerson).collect(Collectors.toList());
     }
 
     public MessageResponseDto addFriendForId(int id) {
@@ -86,7 +105,7 @@ public class FriendsService {
         if (friendStatus.equals(FriendshipStatus.FRIEND.toString())) {
             daoPerson.deleteFriendForID(currentPerson.getId(), id);
         } else if (friendStatus.equals(FriendshipStatus.REQUEST.toString())) {
-            daoPerson.unAcceptRequest(currentPerson.getId(), id);
+            daoPerson.declineRequest(currentPerson.getId(), id);
         }
         return new MessageResponseDto();
     }

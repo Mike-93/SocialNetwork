@@ -50,7 +50,7 @@ public class DialogsService {
                 || daoPerson.getById(dialog.getFirstUserId()).isBlocked()
                 || daoPerson.getById(dialog.getSecondUserId()).isBlocked()) {
 
-            throw new UserIsBlockedException();
+            throw new UserIsBlockedException("You can't send message (one of the participants of the dialog is blocked)");
         }
         message.setRecipientId(dialog.getFirstUserId() == getActiveUserId()
                 ? dialog.getSecondUserId()
@@ -137,11 +137,15 @@ public class DialogsService {
 
         int activeUserId = daoPerson.getByEmail(SecurityContextHolder.getContext()
                 .getAuthentication().getName()).getId();
+        if (daoPerson.isPersonBlockedByAnotherPerson(activeUserId, request.getUsersIds().get(0)) ||
+                daoPerson.isPersonBlockedByAnotherPerson(request.getUsersIds().get(0), activeUserId)) {
+            throw new UserIsBlockedException("You can't create dialog, you are blocked by this user");
+        }
         Dialog foundDialog = daoDialog.getDialogByUsersId(activeUserId, request.getUsersIds().get(0));
         if (foundDialog == null) {
             int dialogId = daoDialog.createDialog(activeUserId, request.getUsersIds().get(0));
             Person personFromRequest = daoPerson.getById(request.getUsersIds().get(0));
-            sendMessage(dialogId, new MessageSendDtoRequest(String.format("Create new dialog with %s %s",
+            sendMessage(dialogId, new MessageSendDtoRequest(String.format("Hi, %s %s. Let's talk!",
                     personFromRequest.getFirstName(), personFromRequest.getLastName())));
             return new DialogIdDto(dialogId);
         } else {

@@ -1,17 +1,14 @@
 package application.service;
 
 import application.dao.*;
-import application.models.FriendshipStatus;
-import application.models.NotificationType;
-import application.models.Person;
-import application.models.Post;
+import application.dao.mappers.MapperUtil;
+import application.models.*;
 import application.models.dto.MessageResponseDto;
 import application.models.dto.PersonDto;
 import application.models.dto.PostDto;
 import application.models.requests.PersonSettingsDtoRequest;
 import application.models.requests.PostRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,6 +36,7 @@ public class ProfileService {
     private final DaoComment daoComment;
     private final DaoFile daoFile;
     private final DaoNotification daoNotification;
+    private final DaoCity daoCity;
 
     public PersonDto getPerson(int id) {
 
@@ -46,14 +44,11 @@ public class ProfileService {
         if (person == null) {
             throw new EntityNotFoundException(String.format("Person with id %d is not found.", id));
         }
-        if (!person.isBlocked()) {
-            Person activePerson = daoPerson.getAuthPerson();
-            person.setBlocked(daoPerson.isPersonBlockedByAnotherPerson(activePerson.getId(), id));
-        }
-        return PersonDto.fromPerson(person);
+        Person activePerson = daoPerson.getAuthPerson();
+        return MapperUtil.getExtendedPersonDto(PersonDto.fromPerson(person), activePerson.getId(), daoPerson);
     }
 
-    public PersonDto getProfile() throws EntityNotFoundException{
+    public PersonDto getProfile() throws EntityNotFoundException {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Person person = daoPerson.getByEmail(authentication.getName());
@@ -63,7 +58,7 @@ public class ProfileService {
         }
         PersonDto personDto = PersonDto.fromPerson(person);
         personDto.setToken(personDto.getToken());
-
+        personDto.setMe(true);
         return personDto;
     }
 
@@ -91,16 +86,18 @@ public class ProfileService {
                 && (country == null || country.isBlank()) && (city == null || city.isBlank())) {
             return new ArrayList<>();
         }
+        Person activePerson = daoPerson.getAuthPerson();
         if (firstOrLastName != null && !firstOrLastName.isBlank()) {
             return daoPerson.getPersonsByFirstNameSurname(firstOrLastName.trim()).stream().map(PersonDto::fromPerson)
+                    .map(personDto -> MapperUtil.getExtendedPersonDto(personDto, activePerson.getId(), daoPerson))
                     .collect(Collectors.toList());
         }
         ZonedDateTime zonedDateTime = LocalDate.now().atStartOfDay(ZoneId.systemDefault());
         ageFrom = ageFrom != null ? zonedDateTime.minusYears(ageFrom).toInstant().toEpochMilli() : null;
-        ageTo = ageTo != null ? zonedDateTime.minusYears(ageTo).toInstant().toEpochMilli() : null;
-        val listPersons = daoPerson.searchPersons(
-                firstName, lastName, ageFrom, ageTo, country, city);
-        return listPersons.stream().map(PersonDto::fromPerson).collect(Collectors.toList());
+        ageTo = ageTo != null ? zonedDateTime.minusYears(ageTo + 1).toInstant().toEpochMilli() : null;
+        return daoPerson.searchPersons(firstName, lastName, ageFrom, ageTo, country, city).stream()
+                .map(p -> MapperUtil.getExtendedPersonDto(PersonDto.fromPerson(p), activePerson.getId(), daoPerson))
+                .collect(Collectors.toList());
     }
 
     public Post setPost(int authorId, Long publishDate, PostRequest postRequest) {
@@ -125,26 +122,54 @@ public class ProfileService {
     }
 
     public PersonDto changeProfile(PersonSettingsDtoRequest request) throws ParseException {
+
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Person person = daoPerson.getByEmail(email);
         if (person == null) {
             throw new EntityNotFoundException("Person with email " + email + " is not found.");
         }
-
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        Long birthDate = request.getBirthDate() == null ? person.getBirthDate()
-                : dateFormat.parse(request.getBirthDate()).getTime();
+        Long birthDate = request.getBirthDate() == null ? null : dateFormat.parse(request.getBirthDate()).getTime();
         String firstName = request.getFirstName() == null || request.getFirstName().isBlank() ? person.getFirstName()
                 : request.getFirstName();
         String lastName = request.getLastName() == null || request.getLastName().isBlank() ? person.getLastName()
                 : request.getLastName();
         String photo = request.getPhotoId() == null ? person.getPhoto()
                 : daoFile.getPath(Integer.parseInt(request.getPhotoId()));
-        daoPerson.updatePersonData(person.getId(), firstName.trim(), lastName.trim(), birthDate, request.getPhone(),
-                photo, request.getCity(), request.getCountry(), request.getAbout());
+        String phone = request.getPhone();
+        if (phone != null) {
+            phone = request.getPhone().length() == 10 ? "7" + request.getPhone() : request.getPhone();
+        }
+
+        daoPerson.updatePersonData(person.getId(), firstName.trim(), lastName.trim(), birthDate, phone,
+                photo, saveCity(request.getCity()), saveCountry(request.getCountry()), request.getAbout());
+
         return PersonDto.fromPerson(daoPerson.getById(person.getId()));
     }
 
+    private String saveCity(String city) {
+
+        if (city != null) {
+            city = city.trim();
+            City cityFromDb = daoCity.getCityByName(city);
+            if (cityFromDb == null && !city.isBlank()) {
+                daoCity.saveCity(city);
+            }
+        }
+        return city;
+    }
+
+    private String saveCountry(String country) {
+
+        if (country != null) {
+            country = country.trim();
+            Country countryFromDb = daoCity.getCountryByName(country);
+            if (countryFromDb == null && !country.isBlank()) {
+                daoCity.setCountry(country);
+            }
+        }
+        return country;
+    }
 
     public MessageResponseDto deleteProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -167,7 +192,7 @@ public class ProfileService {
         try {
             friendshipStatus = daoPerson.getFriendStatus(id, currentPerson.getId());
             if (friendshipStatus.equals(FriendshipStatus.FRIEND.toString())) {
-                daoPerson.deleteFriendForID(id, daoPerson.getAuthPerson().getId());
+                daoPerson.deleteFriendForID(id, currentPerson.getId());
             } else if (friendshipStatus.equals(FriendshipStatus.REQUEST.toString())) {
                 daoPerson.deleteRequest(id, currentPerson.getId());
             }
@@ -177,8 +202,13 @@ public class ProfileService {
         }
     }
 
-    public MessageResponseDto unlockUser(int id) {
+    public MessageResponseDto unblockUser(int id) {
         daoPerson.unblockUser(id, daoPerson.getAuthPerson().getId());
+        return new MessageResponseDto();
+    }
+
+    public MessageResponseDto checkOnline() {
+        daoPerson.setLastOnlineTime(daoPerson.getAuthPerson().getId());
         return new MessageResponseDto();
     }
 }

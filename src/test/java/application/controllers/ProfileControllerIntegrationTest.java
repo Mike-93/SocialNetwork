@@ -925,39 +925,6 @@ class ProfileControllerIntegrationTest {
                 .andExpect(jsonPath("$.data[0].messages_permission", is("ALL")))
                 .andExpect(jsonPath("$.data[0].last_online_time", is(1627200965049L)))
                 .andExpect(jsonPath("$.data[0].is_blocked", is(false)));
-//                .andExpect(status().isOk())
-//                .andExpect(header().string("Content-Type", "application/json"))
-//                .andExpect(authenticated())
-//                .andExpect(jsonPath("$.error", is("Error")))
-//                .andExpect(jsonPath("$.timestamp").isNotEmpty())
-//                .andExpect(jsonPath("$.total", is(9)))
-//                .andExpect(jsonPath("$.data[0].id", is(2)))
-//                .andExpect(jsonPath("$.data[0].email", is("homa@yandex.ru")))
-//                .andExpect(jsonPath("$.data[0].phone", is("89998887744")))
-//                .andExpect(jsonPath("$.data[0].about", is("Я Хомяков")))
-//                .andExpect(jsonPath("$.data[0].city", is("Москва")))
-//                .andExpect(jsonPath("$.data[0].country", is("Россия")))
-//                .andExpect(jsonPath("$.data[0].first_name", is("Хома")))
-//                .andExpect(jsonPath("$.data[0].last_name", is("Хомяков")))
-//                .andExpect(jsonPath("$.data[0].reg_date", is(1625127990000L)))
-//                .andExpect(jsonPath("$.data[0].birth_date", is(806660790000L)))
-//                .andExpect(jsonPath("$.data[0].messages_permission", is("ALL")))
-//                .andExpect(jsonPath("$.data[0].last_online_time", is(1627200965049L)))
-//                .andExpect(jsonPath("$.data[0].is_blocked", is(false)))
-//                .andExpect(jsonPath("$.data[2].id", is(4)))
-//                .andExpect(jsonPath("$.data[2].email", is("petr@yandex.ru")))
-//                .andExpect(jsonPath("$.data[2].phone", is("89998887744")))
-//                .andExpect(jsonPath("$.data[2].about", is("Немного обо мне")))
-//                .andExpect(jsonPath("$.data[2].city", is("Омск")))
-//                .andExpect(jsonPath("$.data[2].country", is("Россия")))
-//                .andExpect(jsonPath("$.data[2].first_name", is("Пётр")))
-//                .andExpect(jsonPath("$.data[2].last_name", is("Петров")))
-//                .andExpect(jsonPath("$.data[2].reg_date", is(1625127990000L)))
-//                .andExpect(jsonPath("$.data[2].birth_date", is(901355190000L)))
-//                .andExpect(jsonPath("$.data[2].messages_permission", is("ALL")))
-//                .andExpect(jsonPath("$.data[2].last_online_time", is(1627200965049L)))
-//                .andExpect(jsonPath("$.data[2].is_blocked", is(false)))
-//                .andExpect(jsonPath("$.data.length()", is(9)));
     }
 
     @Test
@@ -1020,9 +987,29 @@ class ProfileControllerIntegrationTest {
     @WithUserDetails("ivan@yandex.ru")
     void searchPersonByAgeFromAndAgeToTest13() throws Exception {
 
-        validateResultIncorrectSearch(mockMvc.perform(get("/api/v1/users/search")
-                .param("age_from", "26")
-                .param("age_to", "26")));
+        mockMvc.perform(get("/api/v1/users/search")
+                        .param("age_from", "26")
+                        .param("age_to", "26"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "application/json"))
+                .andExpect(authenticated())
+                .andExpect(jsonPath("$.error", is("Error")))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
+                .andExpect(jsonPath("$.total", is(1)))
+                .andExpect(jsonPath("$.data.length()", is(1)))
+                .andExpect(jsonPath("$.data[0].id", is(2)))
+                .andExpect(jsonPath("$.data[0].email", is("homa@yandex.ru")))
+                .andExpect(jsonPath("$.data[0].phone", is("89998887744")))
+                .andExpect(jsonPath("$.data[0].about", is("Я Хомяков")))
+                .andExpect(jsonPath("$.data[0].city", is("Москва")))
+                .andExpect(jsonPath("$.data[0].country", is("Россия")))
+                .andExpect(jsonPath("$.data[0].first_name", is("Хома")))
+                .andExpect(jsonPath("$.data[0].last_name", is("Хомяков")))
+                .andExpect(jsonPath("$.data[0].reg_date", is(1625127990000L)))
+                .andExpect(jsonPath("$.data[0].birth_date", is(806660790000L)))
+                .andExpect(jsonPath("$.data[0].messages_permission", is("ALL")))
+                .andExpect(jsonPath("$.data[0].last_online_time", is(1627200965049L)))
+                .andExpect(jsonPath("$.data[0].is_blocked", is(false)));
     }
 
     @Test
@@ -1313,7 +1300,7 @@ class ProfileControllerIntegrationTest {
                 .andExpect(jsonPath("$.timestamp").isNotEmpty())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error", is("invalid_request")))
-                .andExpect(jsonPath("$.error_description", is("Unparseable date: \"09.06.1988\"")))
+                .andExpect(jsonPath("$.error_description", is("Date is not valid")))
                 .andExpect(jsonPath("$.data").doesNotExist());
     }
 
@@ -1424,7 +1411,7 @@ class ProfileControllerIntegrationTest {
         request.setCity("Bobryisk");
         request.setCountry("Belarus");
         request.setAbout("Some information");
-        request.setPhone("89774743685");
+        request.setPhone("79774743685");
         request.setPhotoId("1");
 
         validateResultCorrectSearchPersonOrSetPost(mockMvc.perform(put("/api/v1/users/me")
@@ -1434,10 +1421,10 @@ class ProfileControllerIntegrationTest {
                 .andExpect(jsonPath("$.data.city", is("Bobryisk")))
                 .andExpect(jsonPath("$.data.country", is("Belarus")))
                 .andExpect(jsonPath("$.data.about", is("Some information")))
-                .andExpect(jsonPath("$.data.phone", is("89774743685")))
+                .andExpect(jsonPath("$.data.phone", is("79774743685")))
                 .andExpect(jsonPath("$.data.first_name", is("Some name")))
                 .andExpect(jsonPath("$.data.last_name", is("Some surname")))
-                .andExpect(jsonPath("$.data.photo", containsString("storage/testImagepng")))
+                .andExpect(jsonPath("$.data.photo", containsString("testImage.png")))
                 .andExpect(jsonPath("$.data.reg_date", is(1625127990000L)))
                 .andExpect(jsonPath("$.data.birth_date", is(-606798000000L)))
                 .andExpect(jsonPath("$.data.messages_permission", is("ALL")))
@@ -1452,8 +1439,8 @@ class ProfileControllerIntegrationTest {
         PersonSettingsDtoRequest request = new PersonSettingsDtoRequest();
         request.setFirstName("S");
         mockMvc.perform(put("/api/v1/users/me")
-                .content(objectMapper.writeValueAsString(request))
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(header().string("Content-Type", "application/json"))
                 .andExpect(authenticated())
                 .andExpect(jsonPath("$.path", is("/api/v1/users/me")))
@@ -1472,12 +1459,12 @@ class ProfileControllerIntegrationTest {
 
         PersonSettingsDtoRequest request = new PersonSettingsDtoRequest();
         request.setLastName("S");
-       mockMvc.perform(put("/api/v1/users/me")
-                .content(objectMapper.writeValueAsString(request))
-                .contentType(MediaType.APPLICATION_JSON))
-               .andExpect(header().string("Content-Type", "application/json"))
-               .andExpect(authenticated())
-               .andExpect(jsonPath("$.path", is("/api/v1/users/me")))
+        mockMvc.perform(put("/api/v1/users/me")
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(header().string("Content-Type", "application/json"))
+                .andExpect(authenticated())
+                .andExpect(jsonPath("$.path", is("/api/v1/users/me")))
                 .andExpect(jsonPath("$.timestamp").isNotEmpty())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error", is("invalid_request")))
@@ -1493,8 +1480,8 @@ class ProfileControllerIntegrationTest {
         PersonSettingsDtoRequest request = new PersonSettingsDtoRequest();
         request.setFirstName("Sooooooooooooooooooooooooooooooome naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaame");
         mockMvc.perform(put("/api/v1/users/me")
-                .content(objectMapper.writeValueAsString(request))
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(header().string("Content-Type", "application/json"))
                 .andExpect(authenticated())
                 .andExpect(jsonPath("$.path", is("/api/v1/users/me")))
@@ -1513,8 +1500,8 @@ class ProfileControllerIntegrationTest {
         PersonSettingsDtoRequest request = new PersonSettingsDtoRequest();
         request.setLastName("Sooooooooooooooooooooooooooooooome surnaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaame");
         mockMvc.perform(put("/api/v1/users/me")
-                .content(objectMapper.writeValueAsString(request))
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(header().string("Content-Type", "application/json"))
                 .andExpect(authenticated())
                 .andExpect(jsonPath("$.path", is("/api/v1/users/me")))

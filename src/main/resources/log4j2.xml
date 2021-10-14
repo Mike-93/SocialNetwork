@@ -6,7 +6,7 @@
         <Property name="LOG_PATTERN_CONSOLE">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %highlight{%-5level}{FATAL=bg_red, ERROR=red, WARN=yellow, INFO=green} %logger{36} - %msg%n</Property>
         <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
         <Property name="APP_LOG_ROOT">logs</Property>
-        <Property name="SCHEDULE">0 0 0/1 * * ?</Property>
+        <Property name="SCHEDULE">0 0 1/12 * * ?</Property>
     </Properties>
 
     <Appenders>
@@ -23,7 +23,7 @@
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Policies>
                 <CronTriggeringPolicy schedule="${SCHEDULE}"/>
-                <SizeBasedTriggeringPolicy size="50 MB"/>
+                <SizeBasedTriggeringPolicy size="5 MB"/>
             </Policies>
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
@@ -34,7 +34,7 @@
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Policies>
                 <CronTriggeringPolicy schedule="${SCHEDULE}"/>
-                <SizeBasedTriggeringPolicy size="50 MB"/>
+                <SizeBasedTriggeringPolicy size="5 MB"/>
             </Policies>
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
@@ -49,7 +49,7 @@
             </Filters>
             <Policies>
                 <CronTriggeringPolicy schedule="${SCHEDULE}"/>
-                <SizeBasedTriggeringPolicy size="50 MB"/>
+                <SizeBasedTriggeringPolicy size="5 MB"/>
             </Policies>
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>

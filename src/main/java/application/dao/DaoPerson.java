@@ -28,17 +28,6 @@ public class DaoPerson {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public Integer getPersonIdByEmail(String email) {
-
-        log.info("getPersonIdByEmail(): start():");
-        log.debug("getPersonIdByEmail(): email = {}", email);
-        String selectPersonIdByEmail = "SELECT id FROM person WHERE e_mail = ?";
-        Integer id = jdbcTemplate.queryForObject(selectPersonIdByEmail, new Object[]{email}, Integer.class);
-        log.debug("getPersonIdByEmail(): id = {}", id);
-        log.info("getPersonIdByEmail(): finish():");
-        return id;
-    }
-
     public Person getByEmail(String email) {
 
         log.info("getByEmail(): start():");
@@ -85,14 +74,13 @@ public class DaoPerson {
                 "JOIN friendship_status f on f.id = friendship.status_id WHERE code = ? AND src_person_id " +
                 "IN (SELECT dst_person_id FROM friendship WHERE src_person_id = ?)) AND id != ?";
         List<Person> personList = jdbcTemplate.query(selectRecommendations, new Object[]{FriendshipStatus.FRIEND.toString(), id, id,
-                        FriendshipStatus.FRIEND.toString(), id, id},
-                new PersonMapper());
+                        FriendshipStatus.FRIEND.toString(), id, id}, new PersonMapper());
         log.debug("getRecommendations(): personList = {}", personList);
         log.info("getRecommendations(): finish():");
         return personList;
     }
 
-    public List<Integer> getBlockId(int id) {
+    public List<Integer> getBlockedIds(int id) {
         String query = "SELECT blocked_person_id FROM blocking_persons WHERE blocking_person_id = ?";
         return jdbcTemplate.queryForList(query, new Object[]{id}, Integer.class);
     }
@@ -117,11 +105,11 @@ public class DaoPerson {
 
         log.info("updatePersonData(): start():");
         log.debug("updatePersonData(): id = {}, firstName = {}, lastName = {}, birthDate = {}, " +
-                "phone = {}, photo = {}, city = {}, country = {}, about = {}", id, firstName, lastName, birthDate,
+                        "phone = {}, photo = {}, city = {}, country = {}, about = {}", id, firstName, lastName, birthDate,
                 phone, photo, city, country, about);
         jdbcTemplate.update("UPDATE person SET first_name = ?, last_name = ?," +
-                        "birth_date = ?, phone = ?, photo = ?, city = ?, country = ?, about = ? WHERE id = ?", firstName, lastName,
-                birthDate, phone, photo, city, country, about, id);
+                        "birth_date = COALESCE(?, birth_date) , phone = ?, photo = ?, city = ?, country = ?, about = ? " +
+                        "WHERE id = ?", firstName, lastName, birthDate, phone, photo, city, country, about, id);
         log.info("updatePersonData(): finish():");
     }
 
@@ -151,6 +139,7 @@ public class DaoPerson {
         log.info("delete(): finish():");
     }
 
+    @Transactional
     public void deleteFriendshipByPersonId(int id) {
 
         log.info("deleteFriendshipByPersonId(): start():");
@@ -242,6 +231,11 @@ public class DaoPerson {
         return status;
     }
 
+    public Integer getSrcPersonIdFriendRequest(int srcId, int dstId) {
+        String select = "SELECT src_person_id FROM friendship WHERE src_person_id IN (?, ?) AND dst_person_id IN (?, ?)";
+        return jdbcTemplate.queryForObject(select, new Object[]{srcId, dstId, dstId, srcId}, Integer.class);
+    }
+
     public void deleteFriendForID(int srcId, int dstId) {
 
         log.info("deleteFriendForID(): start():");
@@ -263,13 +257,13 @@ public class DaoPerson {
         return getByEmail(authentication.getName());
     }
 
-    public void unAcceptRequest(int dstId, int srcId) {
+    public void declineRequest(int dstId, int srcId) {
 
         log.info("unAcceptRequest(): start():");
         log.debug("unAcceptRequest(): srcId = {}, dstId = {}", srcId, dstId);
         String updateFriendshipStatus = "UPDATE friendship_status SET code = ? WHERE id = (SELECT status_id " +
-                "FROM friendship WHERE dst_person_id = ? AND src_person_id = ?)";
-        jdbcTemplate.update(updateFriendshipStatus, FriendshipStatus.DECLINED.toString(), dstId, srcId);
+                "FROM friendship WHERE dst_person_id IN (?, ?) AND src_person_id IN (?, ?))";
+        jdbcTemplate.update(updateFriendshipStatus, FriendshipStatus.DECLINED.toString(), dstId, srcId, dstId, srcId);
         log.info("unAcceptRequest(): finish():");
     }
 
@@ -309,7 +303,7 @@ public class DaoPerson {
 
         String query = "SELECT * FROM person WHERE (first_name ILIKE ? OR ?::text IS NULL)" +
                 "AND (last_name ILIKE ? OR ?::text IS NULL) AND (birth_date <= ? OR ?::bigint IS NULL) " +
-                "AND (birth_date >= ? OR ?::bigint IS NULL) AND (country ILIKE ? OR ?::text IS NULL) " +
+                "AND (birth_date > ? OR ?::bigint IS NULL) AND (country ILIKE ? OR ?::text IS NULL) " +
                 "AND (city ILIKE ? OR ?::text IS NULL)";
         List<Person> personList = new ArrayList<>(jdbcTemplate.query(query, new Object[]{prepareParam(firstName), firstName,
                 prepareParam(lastName), lastName, ageFrom, ageFrom, ageTo, ageTo, prepareParam(country), country,
@@ -357,6 +351,15 @@ public class DaoPerson {
         return time;
     }
 
+    public void setLastOnlineTime(int personId) {
+
+        log.info("setLastOnlineTime: start():");
+        log.debug("setLastOnlineTime: personId = {}", personId);
+        String query = "UPDATE person SET last_online_time = ? WHERE id = ?";
+        jdbcTemplate.update(query, System.currentTimeMillis(), personId);
+        log.info("setLastOnlineTime: finish():");
+    }
+
     public boolean isPersonBlockedByAnotherPerson(int blockingPerson, int blockedPerson) {
         String query = "SELECT count(*) FROM blocking_persons WHERE blocking_person_id = ? AND blocked_person_id = ?";
         return jdbcTemplate.queryForObject(query, new Object[]{blockingPerson, blockedPerson}, Integer.class) != 0;
@@ -367,18 +370,34 @@ public class DaoPerson {
         jdbcTemplate.update(query, personId, blockId);
     }
 
-    public void unblockUser(int blockUserId, int userId) {
+    public void unblockUser(int blockedPersonId, int blockingPersonId) {
         String query = "DELETE FROM blocking_persons WHERE blocking_person_id = ? AND blocked_person_id = ?";
-        jdbcTemplate.update(query, userId, blockUserId);
+        jdbcTemplate.update(query, blockingPersonId, blockedPersonId);
     }
 
     public void deleteRequest(int id, int id1) {
         String selectStatusId = "SELECT status_id FROM friendship WHERE src_person_id IN (?, ?) " +
                 "AND dst_person_id IN (?, ?)";
-        int statusId = jdbcTemplate.queryForObject(selectStatusId, new Object[]{id, id1, id1, id}, Integer.class);
+        Integer statusId = jdbcTemplate.queryForObject(selectStatusId, new Object[]{id, id1, id1, id}, Integer.class);
         String queryForDeleteStatus = "DELETE FROM friendship_status WHERE id = ?";
         String deleteFriendship = "DELETE FROM friendship WHERE src_person_id IN (?, ?) AND dst_person_id IN (?, ?)";
         jdbcTemplate.update(deleteFriendship, id, id1, id1, id);
         jdbcTemplate.update(queryForDeleteStatus, statusId);
+    }
+
+    public List<Person> getAllPerson () {
+        String query = "SELECT * FROM person";
+        return jdbcTemplate.query(query, new PersonMapper());
+    }
+
+    public List<Integer> getYouBlockId(int id) {
+        String query = "SELECT blocking_person_id FROM blocking_persons WHERE blocked_person_id = ?";
+        return jdbcTemplate.queryForList(query, new Object[]{id}, Integer.class);
+    }
+
+    public List<Integer> getYourRequestId(int id) {
+        String query = "SELECT dst_person_id FROM friendship JOIN friendship_status fs on fs.id = friendship.status_id" +
+                " WHERE src_person_id = ? AND code = ?";
+        return jdbcTemplate.queryForList(query, new Object[]{id, FriendshipStatus.REQUEST.toString()}, Integer.class);
     }
 }
